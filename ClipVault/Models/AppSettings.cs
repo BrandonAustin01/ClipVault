@@ -1,0 +1,12 @@
+namespace ClipVault.Models;
+
+public class AppSettings
+{
+    public bool LaunchOnStartup { get; set; }
+    public bool ClipboardMonitoringEnabled { get; set; } = true;
+    public int MaxHistoryItems { get; set; } = 100;
+    public bool MinimizeToTray { get; set; }
+    public bool CloseToTray { get; set; }
+    public string Theme { get; set; } = "Dark";
+    public string UpdateFeedUrl { get; set; } = string.Empty;
+}

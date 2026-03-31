@@ -1,0 +1,234 @@
+﻿<Window x:Class="ClipVault.SnippetEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Snippet Editor"
+        Width="780"
+        Height="610"
+        MinWidth="680"
+        MinHeight="520"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        Background="#0B1118">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="PanelBrush" Color="#101925"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#121C28"/>
+        <SolidColorBrush x:Key="CardHoverBrush" Color="#152233"/>
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#223040"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#4EA1FF"/>
+        <SolidColorBrush x:Key="AccentStrongBrush" Color="#6AB2FF"/>
+        <SolidColorBrush x:Key="AccentSoftBrush" Color="#162437"/>
+        <SolidColorBrush x:Key="AccentSoftHoverBrush" Color="#1B3047"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F3F7FB"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#95A7BC"/>
+        <SolidColorBrush x:Key="TextSoftBrush" Color="#B9C6D5"/>
+        <SolidColorBrush x:Key="InputBackgroundBrush" Color="#0E1620"/>
+        <SolidColorBrush x:Key="InputBorderBrush" Color="#263547"/>
+        <SolidColorBrush x:Key="InputBorderHoverBrush" Color="#37506A"/>
+
+        <Style x:Key="TextInputStyle" TargetType="TextBox">
+            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Background" Value="{StaticResource InputBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource InputBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CaretBrush" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="SelectionBrush" Value="{StaticResource AccentSoftBrush}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="DialogButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="#162131"/>
+            <Setter Property="BorderBrush" Value="#243548"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#1C2D43"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#35506E"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#223854"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Border" Property="Opacity" Value="0.55"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PrimaryDialogButtonStyle" TargetType="Button" BasedOn="{StaticResource DialogButtonStyle}">
+            <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+            <Setter Property="BorderBrush" Value="#315A87"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentSoftHoverBrush}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource AccentStrongBrush}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#25425F"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="18"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="14"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="14"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="20"
+                Padding="18">
+            <StackPanel>
+                <TextBlock Text="Snippet Editor"
+                           FontSize="27"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimaryBrush}"/>
+                <TextBlock Text="Create reusable text blocks for fast copy and clean recall."
+                           Margin="0,8,0,0"
+                           FontSize="13"
+                           Foreground="{StaticResource TextMutedBrush}"/>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="2"
+                Background="{StaticResource CardBrush}"
+                BorderBrush="{StaticResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="20"
+                Padding="18">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="14"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Title"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               Margin="0,0,0,6"/>
+                    <TextBox x:Name="TitleTextBox"
+                             Height="42"
+                             Style="{StaticResource TextInputStyle}"/>
+
+                    <TextBlock Text="A short name that is easy to spot in your snippet list."
+                               Margin="0,8,0,0"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               FontSize="12"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Category"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               Margin="0,0,0,6"/>
+                    <TextBox x:Name="CategoryTextBox"
+                             Height="42"
+                             Style="{StaticResource TextInputStyle}"/>
+
+                    <TextBlock Text="Optional. Leave it simple, like Snippet, Sales, or Notes."
+                               Margin="0,8,0,0"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               FontSize="12"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="4"
+                Background="{StaticResource CardBrush}"
+                BorderBrush="{StaticResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="20"
+                Padding="18">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Content"
+                           Foreground="{StaticResource TextMutedBrush}"/>
+
+                <TextBlock Grid.Row="2"
+                           Text="Paste or write the full reusable text below."
+                           Foreground="{StaticResource TextMutedBrush}"
+                           FontSize="12"/>
+
+                <TextBox x:Name="ContentTextBox"
+                         Grid.Row="4"
+                         MinHeight="240"
+                         Style="{StaticResource TextInputStyle}"
+                         Padding="14"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         AcceptsTab="True"
+                         VerticalScrollBarVisibility="Auto"
+                         VerticalContentAlignment="Top"/>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="ValidationTextBlock"
+                       VerticalAlignment="Center"
+                       Foreground="#FF9AA5"
+                       FontSize="13"
+                       FontWeight="SemiBold"
+                       Visibility="Collapsed"
+                       TextWrapping="Wrap"/>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="Cancel"
+                        Width="110"
+                        Style="{StaticResource DialogButtonStyle}"
+                        Click="CancelButton_Click"/>
+
+                <Button Content="Save Snippet"
+                        Width="136"
+                        Margin="0,0,0,0"
+                        Style="{StaticResource PrimaryDialogButtonStyle}"
+                        Click="SaveButton_Click"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
