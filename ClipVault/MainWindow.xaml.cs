@@ -10,10 +10,14 @@ using System.Windows.Controls;
 using ClipVault.Models;
 using ClipVault.Services;
 using ClipVault.Helpers;
+using Microsoft.Win32;
+using System.Collections.Generic;
 using WpfBrush = System.Windows.Media.Brush;
 using WpfBrushes = System.Windows.Media.Brushes;
 using WpfButton = System.Windows.Controls.Button;
 using WpfMessageBox = System.Windows.MessageBox;
+using WpfOpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using WpfSaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace ClipVault;
 
@@ -26,6 +30,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly StartupService _startupService = new();
     private readonly TrayIconService _trayIconService = new();
     private readonly UpdateService _updateService = new();
+    private readonly BackupService _backupService = new();
+    private readonly string _displayVersion = AppVersionHelper.GetDisplayVersion();
+
 
     private AppSettings _appSettings = new();
     private bool _sourceInitialized;
@@ -35,12 +42,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private string _currentSectionTitle = "History";
     private string _currentSectionSubtitle = "Your recent copied items will live here.";
     private string _statusMessage = "Starting ClipVault...";
+    private string? _suppressedClipboardTextNormalized;
+
     private int _totalCount;
     private int _pinnedCount;
     private int _snippetCount;
-    private string? _suppressedClipboardTextNormalized;
+    
     private DateTime _suppressedClipboardUntilUtc = DateTime.MinValue;
-    private readonly string _displayVersion = AppVersionHelper.GetDisplayVersion();
     private LogViewerWindow? _logViewerWindow;
 
     public ObservableCollection<ClipboardEntry> AllItems { get; } = new();
@@ -562,6 +570,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         SettingsContentPanel.Visibility = showSettings ? Visibility.Visible : Visibility.Collapsed;
         ClipboardContentPanel.Visibility = showSettings ? Visibility.Collapsed : Visibility.Visible;
+
+        SearchActionPanel.Visibility = showSettings ? Visibility.Collapsed : Visibility.Visible;
+        StatsPanel.Visibility = showSettings ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void ApplyFilter()
@@ -962,6 +973,27 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     if (promptResult == MessageBoxResult.Yes)
                     {
                         LogService.Info($"Applying update {result.TargetVersion}.");
+
+                        try
+                        {
+                            string previousVersion = result.CurrentVersion ?? DisplayVersion;
+                            string currentVersion = string.IsNullOrWhiteSpace(result.TargetVersion)
+                                ? DisplayVersion
+                                : result.TargetVersion;
+
+                            string changelogText = ChangelogCatalog.BuildChangesSince(previousVersion, currentVersion);
+
+                            PostUpdateExperienceService.QueueAnnouncement(
+                                previousVersion,
+                                currentVersion,
+                                changelogText);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogService.Error(ex, "Failed to queue the post-update announcement.");
+                            // Do not block the update if the announcement fails to save.
+                        }
+
                         result.ApplyAndRestart?.Invoke();
                         return;
                     }
@@ -1024,6 +1056,27 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }, "Clear history");
     }
 
+    private void ViewCurrentChangelogButton_Click(object sender, RoutedEventArgs e)
+    {
+        RunGuarded(() =>
+        {
+            var announcement = new PostUpdateAnnouncement
+            {
+                PreviousVersion = string.Empty,
+                CurrentVersion = DisplayVersion,
+                ChangelogText = ChangelogCatalog.BuildChangesSince(null, DisplayVersion)
+            };
+
+            var window = new UpdateAnnouncementWindow(announcement)
+            {
+                Owner = this
+            };
+
+            window.ShowDialog();
+            StatusMessage = "Opened current changelog.";
+        }, "Open current changelog");
+    }
+
     private void OpenDataFolderButton_Click(object sender, RoutedEventArgs e)
     {
         RunGuarded(() =>
@@ -1068,5 +1121,101 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             StatusMessage = "Opened logs folder.";
         }, "Open logs folder");
+    }
+
+    private void ReloadFromStorage()
+    {
+        _appSettings = _storageService.LoadAppSettings();
+        _appSettings.LaunchOnStartup = _startupService.IsStartupEnabled();
+
+        LoadPersistedItems();
+        ApplySettingsToUi();
+        ApplyClipboardMonitoringSetting();
+        ApplyTrayVisibility();
+        ApplyFilter();
+        UpdateStats();
+    }
+
+    private void ExportBackupButton_Click(object sender, RoutedEventArgs e)
+    {
+        RunGuarded(() =>
+        {
+            var dialog = new WpfSaveFileDialog
+            {
+                Title = "Export ClipVault Backup",
+                Filter = "ClipVault Backup (*.cvxbackup.json)|*.cvxbackup.json|JSON files (*.json)|*.json|All files (*.*)|*.*",
+                FileName = _backupService.BuildDefaultFileName(DisplayVersion),
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                AddExtension = true,
+                DefaultExt = ".json",
+                OverwritePrompt = true
+            };
+
+            bool? result = dialog.ShowDialog(this);
+            if (result != true)
+            {
+                StatusMessage = "Backup export canceled.";
+                return;
+            }
+
+            _backupService.ExportToFile(
+                dialog.FileName,
+                DisplayVersion,
+                _appSettings,
+                AllItems);
+
+            StatusMessage = $"Exported backup with {AllItems.Count} item(s).";
+            LogService.Info($"Backup exported to {dialog.FileName}");
+        }, "Backup export");
+    }
+
+    private void ImportBackupButton_Click(object sender, RoutedEventArgs e)
+    {
+        RunGuarded(() =>
+        {
+            var dialog = new WpfOpenFileDialog
+            {
+                Title = "Import ClipVault Backup",
+                Filter = "ClipVault Backup (*.cvxbackup.json)|*.cvxbackup.json|JSON files (*.json)|*.json|All files (*.*)|*.*",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                CheckFileExists = true,
+                Multiselect = false
+            };
+
+            bool? result = dialog.ShowDialog(this);
+            if (result != true)
+            {
+                StatusMessage = "Backup import canceled.";
+                return;
+            }
+
+            var document = _backupService.LoadFromFile(dialog.FileName);
+            var importedSettings = _backupService.ToAppSettings(document);
+            var importedItems = _backupService.ToClipboardEntries(document);
+
+            var confirmResult = WpfMessageBox.Show(
+                $"Import this ClipVault backup?{Environment.NewLine}{Environment.NewLine}" +
+                $"This will replace your current local ClipVault data.{Environment.NewLine}{Environment.NewLine}" +
+                $"Items in backup: {importedItems.Count}{Environment.NewLine}" +
+                $"Exported from version: {document.ExportedFromVersion}{Environment.NewLine}" +
+                $"Exported at: {document.ExportedAtUtc.ToLocalTime():g}",
+                "Import ClipVault Backup",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (confirmResult != MessageBoxResult.Yes)
+            {
+                StatusMessage = "Backup import canceled.";
+                return;
+            }
+
+            _storageService.ReplaceAllData(importedItems, importedSettings);
+            _startupService.SetStartupEnabled(importedSettings.LaunchOnStartup);
+
+            ReloadFromStorage();
+
+            StatusMessage = $"Imported backup with {importedItems.Count} item(s).";
+            LogService.Info($"Backup imported from {dialog.FileName}");
+        }, "Backup import");
     }
 }

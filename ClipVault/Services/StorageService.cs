@@ -97,6 +97,89 @@ public sealed class StorageService
         return items;
     }
 
+    public void ReplaceAllData(IEnumerable<ClipboardEntry> items, AppSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        ArgumentNullException.ThrowIfNull(settings);
+
+        var itemList = items.ToList();
+
+        using var connection = CreateConnection();
+        connection.Open();
+
+        using var transaction = connection.BeginTransaction();
+
+        using (var deleteItemsCommand = connection.CreateCommand())
+        {
+            deleteItemsCommand.Transaction = transaction;
+            deleteItemsCommand.CommandText = "DELETE FROM ClipboardItems;";
+            deleteItemsCommand.ExecuteNonQuery();
+        }
+
+        using (var deleteSettingsCommand = connection.CreateCommand())
+        {
+            deleteSettingsCommand.Transaction = transaction;
+            deleteSettingsCommand.CommandText = "DELETE FROM AppSettings;";
+            deleteSettingsCommand.ExecuteNonQuery();
+        }
+
+        using (var insertItemCommand = connection.CreateCommand())
+        {
+            insertItemCommand.Transaction = transaction;
+            insertItemCommand.CommandText =
+                """
+            INSERT INTO ClipboardItems (Title, Category, FullText, IsSnippet, IsPinned, CapturedAt)
+            VALUES ($title, $category, $fullText, $isSnippet, $isPinned, $capturedAt);
+            """;
+
+            var titleParameter = insertItemCommand.Parameters.Add("$title", Microsoft.Data.Sqlite.SqliteType.Text);
+            var categoryParameter = insertItemCommand.Parameters.Add("$category", Microsoft.Data.Sqlite.SqliteType.Text);
+            var fullTextParameter = insertItemCommand.Parameters.Add("$fullText", Microsoft.Data.Sqlite.SqliteType.Text);
+            var isSnippetParameter = insertItemCommand.Parameters.Add("$isSnippet", Microsoft.Data.Sqlite.SqliteType.Integer);
+            var isPinnedParameter = insertItemCommand.Parameters.Add("$isPinned", Microsoft.Data.Sqlite.SqliteType.Integer);
+            var capturedAtParameter = insertItemCommand.Parameters.Add("$capturedAt", Microsoft.Data.Sqlite.SqliteType.Text);
+
+            foreach (var item in itemList)
+            {
+                titleParameter.Value = item.Title;
+                categoryParameter.Value = item.Category;
+                fullTextParameter.Value = item.FullText;
+                isSnippetParameter.Value = item.IsSnippet ? 1 : 0;
+                isPinnedParameter.Value = item.IsPinned ? 1 : 0;
+                capturedAtParameter.Value = item.CapturedAt.ToString("O", CultureInfo.InvariantCulture);
+
+                insertItemCommand.ExecuteNonQuery();
+            }
+        }
+
+        SaveSettingInternal(connection, transaction, "LaunchOnStartup", settings.LaunchOnStartup ? "1" : "0");
+        SaveSettingInternal(connection, transaction, "ClipboardMonitoringEnabled", settings.ClipboardMonitoringEnabled ? "1" : "0");
+        SaveSettingInternal(connection, transaction, "MaxHistoryItems", settings.MaxHistoryItems.ToString(CultureInfo.InvariantCulture));
+        SaveSettingInternal(connection, transaction, "MinimizeToTray", settings.MinimizeToTray ? "1" : "0");
+        SaveSettingInternal(connection, transaction, "CloseToTray", settings.CloseToTray ? "1" : "0");
+        SaveSettingInternal(connection, transaction, "Theme", settings.Theme ?? "Dark");
+        SaveSettingInternal(connection, transaction, "UpdateFeedUrl", settings.UpdateFeedUrl ?? string.Empty);
+
+        transaction.Commit();
+    }
+
+    private static void SaveSettingInternal(SqliteConnection connection,SqliteTransaction transaction, string key, string value)
+    {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText =
+            """
+        INSERT INTO AppSettings (Key, Value)
+        VALUES ($key, $value)
+        ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;
+        """;
+
+        command.Parameters.AddWithValue("$key", key);
+        command.Parameters.AddWithValue("$value", value);
+
+        command.ExecuteNonQuery();
+    }
+
     public int InsertItem(ClipboardEntry item)
     {
         using var connection = CreateConnection();

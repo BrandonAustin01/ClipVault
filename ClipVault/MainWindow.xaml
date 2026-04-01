@@ -296,7 +296,8 @@
                 </Border>
             </Grid>
 
-            <Border Grid.Row="1"
+            <Border x:Name="SearchActionPanel"
+                    Grid.Row="1"
                     Background="{StaticResource PanelBrush}"
                     BorderBrush="{StaticResource CardBorderBrush}"
                     BorderThickness="1"
@@ -329,7 +330,8 @@
                 </Grid>
             </Border>
 
-            <UniformGrid Grid.Row="2"
+            <UniformGrid x:Name="StatsPanel"
+                         Grid.Row="2"
                          Columns="3"
                          Margin="0,0,0,18">
                 <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
@@ -533,138 +535,281 @@
                 </Border>
 
                 <Border x:Name="SettingsContentPanel"
-                        Visibility="Collapsed"
-                        Background="{StaticResource PanelBrush}"
+        Visibility="Collapsed"
+        Background="{StaticResource PanelBrush}"
+        BorderBrush="{StaticResource CardBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="22"
+        Padding="20">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="18"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Top row -->
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.15*"/>
+                                    <ColumnDefinition Width="0.85*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- General -->
+                                <Border Grid.Column="0"
+                        Margin="0,0,10,0"
+                        Background="{StaticResource CardBrush}"
                         BorderBrush="{StaticResource CardBorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="22"
-                        Padding="18">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                        CornerRadius="18"
+                        Padding="22">
+                                    <StackPanel>
+                                        <TextBlock Text="General"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"/>
 
-                        <Border Grid.Column="0"
-                                Margin="0,0,10,0"
-                                Background="{StaticResource CardBrush}"
+                                        <TextBlock Text="Core ClipVault behavior and local app preferences."
+                                   Margin="0,6,0,0"
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   TextWrapping="Wrap"/>
+
+                                        <CheckBox x:Name="ChkLaunchOnStartup"
+                                  Content="Launch ClipVault on startup"
+                                  Margin="0,22,0,0"
+                                  Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                        <CheckBox x:Name="ChkClipboardMonitoring"
+                                  Content="Watch clipboard changes automatically"
+                                  Margin="0,10,0,0"
+                                  Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                        <CheckBox x:Name="ChkMinimizeToTray"
+                                  Content="Minimize to system tray"
+                                  Margin="0,10,0,0"
+                                  Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                        <CheckBox x:Name="ChkCloseToTray"
+                                  Content="Close to system tray instead of exiting"
+                                  Margin="0,10,0,0"
+                                  Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                        <TextBlock Text="Max history items"
+                                   Margin="0,22,0,8"
+                                   Foreground="{StaticResource TextMutedBrush}"/>
+
+                                        <TextBox x:Name="MaxHistoryItemsTextBox"
+                                 Width="220"
+                                 HorizontalAlignment="Left"
+                                 Style="{StaticResource TextInputStyle}"/>
+
+                                        <Border Margin="0,22,0,0"
+                                Background="#0F1823"
                                 BorderBrush="{StaticResource CardBorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="18"
-                                Padding="18">
-                            <StackPanel>
-                                <TextBlock Text="General"
-                                           FontSize="18"
-                                           FontWeight="Bold"
-                                           Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                <CheckBox x:Name="ChkLaunchOnStartup"
-                                          Content="Launch ClipVault on startup"
-                                          Margin="0,18,0,0"
-                                          Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                <CheckBox x:Name="ChkClipboardMonitoring"
-                                          Content="Watch clipboard changes automatically"
-                                          Margin="0,10,0,0"
-                                          Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                <CheckBox x:Name="ChkMinimizeToTray"
-                                          Content="Minimize to system tray"
-                                          Margin="0,10,0,0"
-                                          Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                <CheckBox x:Name="ChkCloseToTray"
-                                          Content="Close to system tray instead of exiting"
-                                          Margin="0,10,0,0"
-                                          Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                <TextBlock Text="Max history items"
-                                           Margin="0,18,0,6"
-                                           Foreground="{StaticResource TextMutedBrush}"/>
-
-                                <TextBox x:Name="MaxHistoryItemsTextBox"
-                                         Style="{StaticResource TextInputStyle}"/>
-
-                                <TextBlock Text="Updates"
-                                           Margin="0,18,0,6"
-                                           Foreground="{StaticResource TextMutedBrush}"/>
-
-                                <TextBlock Text="ClipVault checks the official release feed built into this app."
+                                CornerRadius="14"
+                                Padding="14">
+                                            <StackPanel>
+                                                <TextBlock Text="Updates"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           FontSize="12"/>
+                                                <TextBlock Text="ClipVault checks the official release feed built into this app."
+                                           Margin="0,6,0,0"
                                            Foreground="{StaticResource TextPrimaryBrush}"
                                            TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
 
-                                <Button Content="Save Settings"
-                                        Margin="0,18,0,0"
-                                        Width="140"
-                                        Style="{StaticResource PrimaryButtonStyle}"
-                                        Click="SaveSettingsButton_Click"/>
+                                        <Grid Margin="0,22,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="Settings are stored locally in SQLite."
-                                           Margin="0,14,0,0"
-                                           Foreground="{StaticResource TextMutedBrush}"
-                                           TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
+                                            <TextBlock Text="Settings are stored locally in SQLite."
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       TextWrapping="Wrap"/>
 
-                        <Border Grid.Column="1"
-                                Margin="10,0,0,0"
+                                            <Button Grid.Column="1"
+                                    Content="Save Settings"
+                                    Width="150"
+                                    Margin="16,0,0,0"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    Click="SaveSettingsButton_Click"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Right column -->
+                                <Grid Grid.Column="1" Margin="10,0,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="14"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Data & Backup -->
+                                    <Border Grid.Row="0"
+                            Background="{StaticResource CardBrush}"
+                            BorderBrush="{StaticResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="18"
+                            Padding="22">
+                                        <StackPanel>
+                                            <TextBlock Text="Data &amp; Backup"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                            <TextBlock Text="Protect your local clipboard history, snippets, and app settings."
+                                       Margin="0,6,0,0"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       TextWrapping="Wrap"/>
+
+                                            <WrapPanel Margin="0,18,0,0">
+                                                <Button Content="Export Backup"
+                                        Width="145"
+                                        Margin="0,0,10,10"
+                                        Style="{StaticResource ActionButtonStyle}"
+                                        Click="ExportBackupButton_Click"/>
+
+                                                <Button Content="Import Backup"
+                                        Width="145"
+                                        Margin="0,0,0,10"
+                                        Style="{StaticResource ActionButtonStyle}"
+                                        Click="ImportBackupButton_Click"/>
+
+                                                <Button Content="Open Data Folder"
+                                        Width="145"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ActionButtonStyle}"
+                                        Click="OpenDataFolderButton_Click"/>
+                                            </WrapPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Updates + Maintenance -->
+                                    <Grid Grid.Row="2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="12"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Updates -->
+                                        <Border Grid.Column="0"
                                 Background="{StaticResource CardBrush}"
                                 BorderBrush="{StaticResource CardBorderBrush}"
                                 BorderThickness="1"
                                 CornerRadius="18"
-                                Padding="18">
-                            <StackPanel>
-                                <TextBlock Text="Maintenance"
+                                Padding="20">
+                                            <StackPanel>
+                                                <TextBlock Text="Updates"
                                            FontSize="18"
                                            FontWeight="Bold"
                                            Foreground="{StaticResource TextPrimaryBrush}"/>
 
-                                <Button Content="Check for Updates"
+                                                <TextBlock Text="Stay current and review what changed."
+                                           Margin="0,6,0,0"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           TextWrapping="Wrap"/>
+
+                                                <Button Content="Check for Updates"
                                         Margin="0,18,0,0"
                                         Width="160"
                                         Style="{StaticResource PrimaryButtonStyle}"
                                         Click="CheckForUpdatesButton_Click"/>
 
-                                <Button Content="Clear Non-Pinned History"
-                                        Margin="0,12,0,0"
-                                        Width="180"
-                                        Style="{StaticResource DangerButtonStyle}"
-                                        Click="ClearHistoryButton_Click"/>
-
-                                <Button Content="Open Data Folder"
-                                        Margin="0,12,0,0"
-                                        Width="140"
+                                                <Button Content="View Changelog"
+                                        Margin="0,10,0,0"
+                                        Width="160"
                                         Style="{StaticResource ActionButtonStyle}"
-                                        Click="OpenDataFolderButton_Click"/>
+                                        Click="ViewCurrentChangelogButton_Click"/>
+                                            </StackPanel>
+                                        </Border>
 
-                                <Button Content="View Current Log"
-                                        Margin="0,12,0,0"
-                                        Width="140"
+                                        <!-- Maintenance -->
+                                        <Border Grid.Column="2"
+                                Background="{StaticResource CardBrush}"
+                                BorderBrush="{StaticResource CardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="18"
+                                Padding="20">
+                                            <StackPanel>
+                                                <TextBlock Text="Maintenance"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                                <TextBlock Text="Logs, cleanup tools, and local diagnostics."
+                                           Margin="0,6,0,0"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           TextWrapping="Wrap"/>
+
+                                                <Button Content="View Current Log"
+                                        Margin="0,18,0,0"
+                                        Width="150"
                                         Style="{StaticResource ActionButtonStyle}"
                                         Click="OpenLogViewerButton_Click"/>
 
-                                <Button Content="Open Logs Folder"
-                                        Margin="0,12,0,0"
-                                        Width="140"
+                                                <Button Content="Open Logs Folder"
+                                        Margin="0,10,0,0"
+                                        Width="150"
                                         Style="{StaticResource ActionButtonStyle}"
                                         Click="OpenLogsFolderButton_Click"/>
 
-                                <TextBlock Text="Database"
-                                           Margin="0,18,0,4"
-                                           Foreground="{StaticResource TextMutedBrush}"/>
-                                <TextBlock Text="{Binding DatabasePath}"
-                                           Foreground="{StaticResource TextPrimaryBrush}"
-                                           TextWrapping="Wrap"/>
+                                                <Button Content="Clear Non-Pinned History"
+        Margin="0,10,0,0"
+        Padding="18,10"
+        MinWidth="220"
+        HorizontalAlignment="Left"
+        Style="{StaticResource DangerButtonStyle}"
+        Click="ClearHistoryButton_Click"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
 
-                                <TextBlock Text="Current log"
-                                           Margin="0,16,0,4"
-                                           Foreground="{StaticResource TextMutedBrush}"/>
-                                <TextBlock Text="{Binding CurrentLogPath}"
-                                           Foreground="{StaticResource TextPrimaryBrush}"
-                                           TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
+                            <!-- Bottom info card -->
+                            <Border Grid.Row="2"
+                    Background="{StaticResource CardBrush}"
+                    BorderBrush="{StaticResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="18"
+                    Padding="20">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="24"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Database"
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   FontSize="12"/>
+                                        <TextBlock Text="{Binding DatabasePath}"
+                                   Margin="0,8,0,0"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Current log"
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   FontSize="12"/>
+                                        <TextBlock Text="{Binding CurrentLogPath}"
+                                   Margin="0,8,0,0"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </ScrollViewer>
                 </Border>
             </Grid>
         </Grid>

@@ -45,6 +45,18 @@ public partial class App : WpfApplication
             MainWindow = mainWindow;
             mainWindow.Show();
 
+            mainWindow.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                try
+                {
+                    PostUpdateExperienceService.ShowPendingAnnouncement(mainWindow);
+                }
+                catch (Exception ex)
+                {
+                    LogService.Error(ex, "Failed to show the post-update announcement.");
+                }
+            }), DispatcherPriority.Background);
+
             LogService.Info("ClipVault startup completed.");
         }
         catch (Exception ex)
