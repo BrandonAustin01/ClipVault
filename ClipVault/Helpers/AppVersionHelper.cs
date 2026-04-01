@@ -25,7 +25,7 @@ public static class AppVersionHelper
             return $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{Math.Max(assemblyVersion.Build, 0)}";
         }
 
-        return "1.0.0";
+        return "1.1.0";
     }
 
     private static string CleanVersion(string? value)

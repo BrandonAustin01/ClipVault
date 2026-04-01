@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace ClipVault.Helpers
 {
@@ -15,12 +15,43 @@ namespace ClipVault.Helpers
 
         // Add a new entry here every release.
         private static readonly IReadOnlyList<ChangelogEntry> Entries = new List<ChangelogEntry>
-    {
-        new()
         {
-            Version = new Version(1, 0, 0),
-            VersionLabel = "1.0.0",
-            Notes =
+            new()
+            {
+                Version = new Version(1, 1, 0),
+                VersionLabel = "1.1.0",
+                Notes =
+"""
+Highlights
+- Backup export and import
+- Redesigned Settings page
+- Post-update message
+- Built-in changelog viewer
+- UI polish across the app
+- Styled dialogs and improved window consistency
+
+Included in this release
+- Added backup export for local ClipVault data
+- Added backup import with replace confirmation flow
+- Added post-update popup after installing a new version
+- Added built-in changelog viewer
+- Redesigned the Settings page for a cleaner layout
+- Polished the main window UI
+- Matched popup window styling across the app
+- Added custom in-app dialogs for a more consistent look
+- Improved scrollbar styling
+- Improved overall visual consistency and usability
+
+Summary
+ClipVault 1.1.0 builds on the first full release with backup support, a cleaner settings experience, a better update flow, and a more polished UI throughout the app.
+"""
+            },
+
+            new()
+            {
+                Version = new Version(1, 0, 0),
+                VersionLabel = "1.0.0",
+                Notes =
 """
 Highlights
 - Clipboard history
@@ -41,22 +72,8 @@ Included in this release
 Summary
 ClipVault 1.0.0 delivers the polished core experience and sets the foundation for future updates.
 """
-        }
-
-        // Example for future releases:
-        // new()
-        // {
-        //     Version = new Version(1, 0, 1),
-        //     VersionLabel = "1.0.1",
-        //     Notes =
-        // """
-        // Improvements
-        // - Added post-update welcome experience
-        // - Added built-in changelog viewer
-        // - Fixed ...
-        // """
-        // }
-    };
+            }
+        };
 
         public static string BuildChangesSince(string? previousVersion, string? currentVersion)
         {

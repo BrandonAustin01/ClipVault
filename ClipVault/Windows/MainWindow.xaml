@@ -11,7 +11,12 @@
         MinWidth="1100"
         MinHeight="700"
         WindowStartupLocation="CenterScreen"
-        Background="#0B1118">
+        Background="#0B1118"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        TextOptions.TextHintingMode="Fixed">
 
     <Window.Resources>
         <!-- Core palette -->
@@ -315,6 +320,12 @@
                     <Setter Property="BorderBrush" Value="{StaticResource CardBorderHoverBrush}"/>
                 </Trigger>
             </Style.Triggers>
+        </Style>
+
+        <!-- Settings cards stay crisp without the shared shadow -->
+        <Style x:Key="SettingsCardStyle" TargetType="Border" BasedOn="{StaticResource SurfaceCardStyle}">
+            <Setter Property="Effect" Value="{x:Null}"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
         </Style>
 
         <!-- Item card -->
@@ -721,7 +732,7 @@
                                     <!-- General -->
                                     <Border Grid.Column="0"
                                             Margin="0,0,10,0"
-                                            Style="{StaticResource SurfaceCardStyle}"
+                                            Style="{StaticResource SettingsCardStyle}"
                                             Padding="22">
                                         <StackPanel>
                                             <TextBlock Text="General"
@@ -811,7 +822,7 @@
 
                                         <!-- Data and backup -->
                                         <Border Grid.Row="0"
-                                                Style="{StaticResource SurfaceCardStyle}"
+                                                Style="{StaticResource SettingsCardStyle}"
                                                 Padding="22">
                                             <StackPanel>
                                                 <TextBlock Text="Data &amp; Backup"
@@ -849,14 +860,14 @@
                                         <!-- Updates and maintenance -->
                                         <Grid Grid.Row="2">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="0.92*"/>
                                                 <ColumnDefinition Width="12"/>
-                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="1.08*"/>
                                             </Grid.ColumnDefinitions>
 
                                             <!-- Updates -->
                                             <Border Grid.Column="0"
-                                                    Style="{StaticResource SurfaceCardStyle}"
+                                                    Style="{StaticResource SettingsCardStyle}"
                                                     Padding="20">
                                                 <StackPanel>
                                                     <TextBlock Text="Updates"
@@ -871,13 +882,13 @@
 
                                                     <Button Content="Check for Updates"
                                                             Margin="0,18,0,0"
-                                                            Width="160"
+                                                            HorizontalAlignment="Stretch"
                                                             Style="{StaticResource PrimaryButtonStyle}"
                                                             Click="CheckForUpdatesButton_Click"/>
 
                                                     <Button Content="View Changelog"
                                                             Margin="0,10,0,0"
-                                                            Width="160"
+                                                            HorizontalAlignment="Stretch"
                                                             Style="{StaticResource ActionButtonStyle}"
                                                             Click="ViewCurrentChangelogButton_Click"/>
                                                 </StackPanel>
@@ -885,7 +896,7 @@
 
                                             <!-- Maintenance -->
                                             <Border Grid.Column="2"
-                                                    Style="{StaticResource SurfaceCardStyle}"
+                                                    Style="{StaticResource SettingsCardStyle}"
                                                     Padding="20">
                                                 <StackPanel>
                                                     <TextBlock Text="Maintenance"
@@ -900,23 +911,25 @@
 
                                                     <Button Content="View Current Log"
                                                             Margin="0,18,0,0"
-                                                            Width="150"
+                                                            HorizontalAlignment="Stretch"
                                                             Style="{StaticResource ActionButtonStyle}"
                                                             Click="OpenLogViewerButton_Click"/>
 
                                                     <Button Content="Open Logs Folder"
                                                             Margin="0,10,0,0"
-                                                            Width="150"
+                                                            HorizontalAlignment="Stretch"
                                                             Style="{StaticResource ActionButtonStyle}"
                                                             Click="OpenLogsFolderButton_Click"/>
 
-                                                    <Button Content="Clear Non-Pinned History"
-                                                            Margin="0,10,0,0"
-                                                            Padding="18,10"
-                                                            MinWidth="230"
-                                                            HorizontalAlignment="Left"
+                                                    <Button Margin="0,10,0,0"
+                                                            Padding="16,10"
+                                                            HorizontalAlignment="Stretch"
                                                             Style="{StaticResource DangerButtonStyle}"
-                                                            Click="ClearHistoryButton_Click"/>
+                                                            Click="ClearHistoryButton_Click">
+                                                        <TextBlock Text="Clear Non-Pinned History"
+                                                                   TextWrapping="Wrap"
+                                                                   TextAlignment="Center"/>
+                                                    </Button>
                                                 </StackPanel>
                                             </Border>
                                         </Grid>
@@ -925,7 +938,7 @@
 
                                 <!-- Storage info -->
                                 <Border Grid.Row="2"
-                                        Style="{StaticResource SurfaceCardStyle}"
+                                        Style="{StaticResource SettingsCardStyle}"
                                         Padding="20">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
