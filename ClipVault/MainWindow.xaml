@@ -14,6 +14,7 @@
         Background="#0B1118">
 
     <Window.Resources>
+        <!-- Core palette -->
         <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0B1118"/>
         <SolidColorBrush x:Key="SidebarBrush" Color="#0F1722"/>
         <SolidColorBrush x:Key="PanelBrush" Color="#101925"/>
@@ -36,11 +37,133 @@
         <SolidColorBrush x:Key="InputBorderBrush" Color="#263547"/>
         <SolidColorBrush x:Key="InputBorderHoverBrush" Color="#37506A"/>
 
+        <!-- Surface accents -->
+        <SolidColorBrush x:Key="CardGlowBrush" Color="#1A2C43"/>
+        <SolidColorBrush x:Key="SurfaceTopStrokeBrush" Color="#314A64"/>
+        <SolidColorBrush x:Key="SurfaceBottomStrokeBrush" Color="#172331"/>
+        <SolidColorBrush x:Key="PillBackgroundBrush" Color="#162334"/>
+        <SolidColorBrush x:Key="PillBorderBrush" Color="#29435D"/>
+        <SolidColorBrush x:Key="PinnedCardBrush" Color="#142334"/>
+        <SolidColorBrush x:Key="PinnedBorderBrush" Color="#4A86C7"/>
+
+        <!-- Sidebar header -->
         <LinearGradientBrush x:Key="SidebarHeaderGlowBrush" StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="#1A2B40" Offset="0"/>
             <GradientStop Color="#0F1722" Offset="1"/>
         </LinearGradientBrush>
 
+        <!-- Scroll chrome -->
+        <SolidColorBrush x:Key="ScrollTrackBrush" Color="#0F1823"/>
+        <SolidColorBrush x:Key="ScrollThumbBrush" Color="#2A4159"/>
+        <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#365674"/>
+        <SolidColorBrush x:Key="ScrollThumbPressedBrush" Color="#46719A"/>
+
+        <Style x:Key="ScrollThumbStyle" TargetType="Thumb">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Background" Value="{StaticResource ScrollThumbBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="ThumbBorder"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6"
+                        Margin="1"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ThumbBorder"
+                                Property="Background"
+                                Value="{StaticResource ScrollThumbHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="ThumbBorder"
+                                Property="Background"
+                                Value="{StaticResource ScrollThumbPressedBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ScrollRepeatButtonStyle" TargetType="RepeatButton">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="Transparent"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="Height" Value="12"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent">
+                            <Border Background="{StaticResource ScrollTrackBrush}"
+                            CornerRadius="6"
+                            Margin="1"/>
+
+                            <Track x:Name="PART_Track"
+                           IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource ScrollRepeatButtonStyle}"
+                                          Command="ScrollBar.PageUpCommand"/>
+                                </Track.DecreaseRepeatButton>
+
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource ScrollThumbStyle}"/>
+                                </Track.Thumb>
+
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource ScrollRepeatButtonStyle}"
+                                          Command="ScrollBar.PageDownCommand"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Orientation" Value="Horizontal">
+                                <Setter Property="Width" Value="Auto"/>
+                                <Setter Property="Height" Value="12"/>
+                            </Trigger>
+                            <Trigger Property="Orientation" Value="Vertical">
+                                <Setter Property="Width" Value="12"/>
+                                <Setter Property="Height" Value="Auto"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Ambient glow -->
+        <RadialGradientBrush x:Key="TopGlowBrush"
+                             Center="0.18,0.0"
+                             GradientOrigin="0.18,0.0"
+                             RadiusX="0.62"
+                             RadiusY="0.62">
+            <GradientStop Color="#16365B" Offset="0"/>
+            <GradientStop Color="#0016365B" Offset="1"/>
+        </RadialGradientBrush>
+
+        <RadialGradientBrush x:Key="BottomGlowBrush"
+                             Center="0.88,1.08"
+                             GradientOrigin="0.88,1.08"
+                             RadiusX="0.72"
+                             RadiusY="0.72">
+            <GradientStop Color="#11263F" Offset="0"/>
+            <GradientStop Color="#0011263F" Offset="1"/>
+        </RadialGradientBrush>
+
+        <!-- Sidebar buttons -->
         <Style x:Key="SidebarButtonStyle" TargetType="Button">
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -78,6 +201,7 @@
             </Style.Triggers>
         </Style>
 
+        <!-- Shared text input -->
         <Style x:Key="TextInputStyle" TargetType="TextBox">
             <Setter Property="Height" Value="42"/>
             <Setter Property="Padding" Value="14,10"/>
@@ -91,6 +215,13 @@
             <Setter Property="SelectionBrush" Value="{StaticResource AccentSoftBrush}"/>
         </Style>
 
+        <!-- Settings checkbox style -->
+        <Style x:Key="SettingCheckBoxStyle" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- Neutral action button -->
         <Style x:Key="ActionButtonStyle" TargetType="Button">
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="Background" Value="#162131"/>
@@ -130,6 +261,7 @@
             </Setter>
         </Style>
 
+        <!-- Primary action button -->
         <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
             <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
             <Setter Property="BorderBrush" Value="#315A87"/>
@@ -145,6 +277,7 @@
             </Style.Triggers>
         </Style>
 
+        <!-- Danger action button -->
         <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
             <Setter Property="Background" Value="{StaticResource DangerBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource DangerBorderBrush}"/>
@@ -160,12 +293,22 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="StatCardStyle" TargetType="Border">
+        <!-- Shared surface card -->
+        <Style x:Key="SurfaceCardStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource CardBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="CornerRadius" Value="20"/>
             <Setter Property="Padding" Value="18"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="10"
+                                      ShadowDepth="0"
+                                      Color="#0A1320"
+                                      Opacity="0.22"/>
+                </Setter.Value>
+            </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{StaticResource CardHoverBrush}"/>
@@ -173,644 +316,649 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Item card -->
+        <Style x:Key="ItemCardStyle" TargetType="Border" BasedOn="{StaticResource SurfaceCardStyle}">
+            <Setter Property="Margin" Value="0,0,0,14"/>
+            <Setter Property="Padding" Value="18"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsPinned}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource PinnedCardBrush}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource PinnedBorderBrush}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid Background="{StaticResource AppBackgroundBrush}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="238"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <Ellipse Width="860"
+                 Height="860"
+                 Fill="{StaticResource TopGlowBrush}"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Top"
+                 Margin="-180,-260,0,0"
+                 IsHitTestVisible="False"
+                 Panel.ZIndex="0"/>
 
-        <Border Grid.Column="0"
-                Background="{StaticResource SidebarBrush}"
-                BorderBrush="#182433"
-                BorderThickness="0,0,1,0">
-            <Grid Margin="18">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+        <Ellipse Width="940"
+                 Height="940"
+                 Fill="{StaticResource BottomGlowBrush}"
+                 HorizontalAlignment="Right"
+                 VerticalAlignment="Bottom"
+                 Margin="0,0,-260,-320"
+                 IsHitTestVisible="False"
+                 Panel.ZIndex="0"/>
 
-                <Border Grid.Row="0"
-                        Background="{StaticResource SidebarHeaderGlowBrush}"
-                        BorderBrush="#203145"
-                        BorderThickness="1"
-                        CornerRadius="18"
-                        Padding="16">
-                    <StackPanel>
-                        <TextBlock Text="ClipVault"
-                                   FontSize="28"
-                                   FontWeight="Bold"
-                                   Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <TextBlock Text="{Binding DisplayVersion, StringFormat=CVX Build {0}}"
-                                   Margin="0,6,0,0"
-                                   FontSize="12"
-                                   Foreground="{StaticResource TextMutedBrush}"/>
+        <Grid Panel.ZIndex="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="238"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Sidebar -->
+            <Border Grid.Column="0"
+                    Background="{StaticResource SidebarBrush}"
+                    BorderBrush="#182433"
+                    BorderThickness="0,0,1,0">
+                <Grid Margin="18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            Background="{StaticResource SidebarHeaderGlowBrush}"
+                            BorderBrush="#263B52"
+                            BorderThickness="1"
+                            CornerRadius="20"
+                            Padding="18">
+                        <StackPanel>
+                            <TextBlock Text="ClipVault"
+                                       FontSize="28"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="{Binding DisplayVersion, StringFormat=CVX Build {0}}"
+                                       Margin="0,8,0,0"
+                                       FontSize="12"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       Opacity="0.95"/>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Grid.Row="2">
+                        <Button x:Name="BtnHistory"
+                                Content="History"
+                                Tag="History"
+                                Style="{StaticResource SidebarButtonStyle}"
+                                Click="SectionButton_Click"/>
+
+                        <Button x:Name="BtnPinned"
+                                Content="Pinned"
+                                Tag="Pinned"
+                                Style="{StaticResource SidebarButtonStyle}"
+                                Click="SectionButton_Click"/>
+
+                        <Button x:Name="BtnSnippets"
+                                Content="Snippets"
+                                Tag="Snippets"
+                                Style="{StaticResource SidebarButtonStyle}"
+                                Click="SectionButton_Click"/>
+
+                        <Button x:Name="BtnSettings"
+                                Content="Settings"
+                                Tag="Settings"
+                                Style="{StaticResource SidebarButtonStyle}"
+                                Click="SectionButton_Click"/>
                     </StackPanel>
-                </Border>
 
-                <StackPanel Grid.Row="2">
-                    <Button x:Name="BtnHistory"
-                            Content="History"
-                            Tag="History"
-                            Style="{StaticResource SidebarButtonStyle}"
-                            Click="SectionButton_Click"/>
-
-                    <Button x:Name="BtnPinned"
-                            Content="Pinned"
-                            Tag="Pinned"
-                            Style="{StaticResource SidebarButtonStyle}"
-                            Click="SectionButton_Click"/>
-
-                    <Button x:Name="BtnSnippets"
-                            Content="Snippets"
-                            Tag="Snippets"
-                            Style="{StaticResource SidebarButtonStyle}"
-                            Click="SectionButton_Click"/>
-
-                    <Button x:Name="BtnSettings"
-                            Content="Settings"
-                            Tag="Settings"
-                            Style="{StaticResource SidebarButtonStyle}"
-                            Click="SectionButton_Click"/>
-                </StackPanel>
-
-                <Border Grid.Row="3"
-                        Background="#121C28"
-                        BorderBrush="#223040"
-                        BorderThickness="1"
-                        CornerRadius="18"
-                        Padding="14">
-                    <StackPanel>
-                        <TextBlock Text="Status"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="12"/>
-                        <TextBlock Text="{Binding StatusMessage}"
-                                   Margin="0,8,0,0"
-                                   TextWrapping="Wrap"
-                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                   FontSize="13"
-                                   LineHeight="20"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </Border>
-
-        <Grid Grid.Column="1" Margin="22">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <Grid Grid.Row="0" Margin="0,0,0,18">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <StackPanel>
-                    <TextBlock Text="{Binding CurrentSectionTitle}"
-                               FontSize="31"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource TextPrimaryBrush}"/>
-                    <TextBlock Text="{Binding CurrentSectionSubtitle}"
-                               Margin="0,6,0,0"
-                               FontSize="13"
-                               Foreground="{StaticResource TextMutedBrush}"/>
-                </StackPanel>
-
-                <Border Grid.Column="1"
-                        Background="{StaticResource AccentSoftBrush}"
-                        BorderBrush="#315A87"
-                        BorderThickness="1"
-                        CornerRadius="14"
-                        Padding="12,8"
-                        VerticalAlignment="Center">
-                    <TextBlock Text="Local SQLite storage"
-                               Foreground="{StaticResource TextPrimaryBrush}"
-                               FontWeight="SemiBold"/>
-                </Border>
-            </Grid>
-
-            <Border x:Name="SearchActionPanel"
-                    Grid.Row="1"
-                    Background="{StaticResource PanelBrush}"
-                    BorderBrush="{StaticResource CardBorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="22"
-                    Padding="16"
-                    Margin="0,0,0,18">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBox x:Name="SearchTextBox"
-                             Grid.Column="0"
-                             Style="{StaticResource TextInputStyle}"
-                             ToolTip="Search titles, categories, and content"
-                             TextChanged="SearchTextBox_TextChanged"/>
-
-                    <Button Grid.Column="1"
-                            Content="Clear Search"
-                            Margin="12,0,8,0"
-                            Style="{StaticResource ActionButtonStyle}"
-                            Click="ClearSearchButton_Click"/>
-
-                    <Button Grid.Column="2"
-                            Content="New Snippet"
-                            Style="{StaticResource PrimaryButtonStyle}"
-                            Click="NewSnippetButton_Click"/>
+                    <Border Grid.Row="3"
+                            Style="{StaticResource SurfaceCardStyle}"
+                            Background="#121C28"
+                            BorderBrush="#223040"
+                            Padding="14">
+                        <StackPanel>
+                            <TextBlock Text="Status"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       FontSize="12"/>
+                            <TextBlock Text="{Binding StatusMessage}"
+                                       Margin="0,8,0,0"
+                                       TextWrapping="Wrap"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="13"
+                                       LineHeight="20"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </Border>
 
-            <UniformGrid x:Name="StatsPanel"
-                         Grid.Row="2"
-                         Columns="3"
-                         Margin="0,0,0,18">
-                <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
-                    <StackPanel>
-                        <TextBlock Text="Clipboard Items"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="12"/>
-                        <TextBlock Text="{Binding TotalCount}"
-                                   Margin="0,8,0,0"
-                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                   FontSize="30"
-                                   FontWeight="Bold"/>
-                    </StackPanel>
-                </Border>
+            <!-- Main content -->
+            <Grid Grid.Column="1" Margin="22">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
-                    <StackPanel>
-                        <TextBlock Text="Pinned"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="12"/>
-                        <TextBlock Text="{Binding PinnedCount}"
-                                   Margin="0,8,0,0"
-                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                   FontSize="30"
-                                   FontWeight="Bold"/>
-                    </StackPanel>
-                </Border>
+                <!-- Section header -->
+                <Grid Grid.Row="0" Margin="0,0,0,18">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <Border Style="{StaticResource StatCardStyle}">
                     <StackPanel>
-                        <TextBlock Text="Snippets"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="12"/>
-                        <TextBlock Text="{Binding SnippetCount}"
-                                   Margin="0,8,0,0"
-                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                   FontSize="30"
-                                   FontWeight="Bold"/>
+                        <TextBlock Text="{Binding CurrentSectionTitle}"
+                                   FontSize="31"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{Binding CurrentSectionSubtitle}"
+                                   Margin="0,6,0,0"
+                                   FontSize="13"
+                                   Foreground="{StaticResource TextMutedBrush}"/>
                     </StackPanel>
-                </Border>
-            </UniformGrid>
 
-            <Grid Grid.Row="3">
-                <Border x:Name="ClipboardContentPanel"
+                    <Border Grid.Column="1"
+                            Background="#132338"
+                            BorderBrush="#355B84"
+                            BorderThickness="1"
+                            CornerRadius="16"
+                            Padding="14,9"
+                            VerticalAlignment="Center">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="14"
+                                              ShadowDepth="0"
+                                              Color="#0B1623"
+                                              Opacity="0.28"/>
+                        </Border.Effect>
+                        <TextBlock Text="Local SQLite storage"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   FontWeight="SemiBold"/>
+                    </Border>
+                </Grid>
+
+                <!-- Search and quick actions -->
+                <Border x:Name="SearchActionPanel"
+                        Grid.Row="1"
                         Background="{StaticResource PanelBrush}"
                         BorderBrush="{StaticResource CardBorderBrush}"
                         BorderThickness="1"
                         CornerRadius="22"
-                        Padding="18">
+                        Padding="16"
+                        Margin="0,0,0,18">
                     <Grid>
-                        <TextBlock x:Name="NoItemsText"
-                                   Text="Nothing to show here yet.&#10;Copy something, pin favorites, or create a snippet."
-                                   Visibility="Collapsed"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   TextAlignment="Center"
-                                   FontSize="18"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   LineHeight="28"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                        <ScrollViewer x:Name="ClipboardScroller"
-                                      VerticalScrollBarVisibility="Auto">
-                            <ItemsControl ItemsSource="{Binding FilteredItems}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Margin="0,0,0,14"
-                                                Padding="16"
-                                                Background="{StaticResource CardBrush}"
-                                                BorderThickness="1"
-                                                CornerRadius="18">
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}"/>
-                                                    <Setter Property="Background" Value="{StaticResource CardBrush}"/>
-                                                    <Style.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Background" Value="{StaticResource CardHoverBrush}"/>
-                                                            <Setter Property="BorderBrush" Value="{StaticResource CardBorderHoverBrush}"/>
-                                                        </Trigger>
-                                                        <DataTrigger Binding="{Binding IsPinned}" Value="True">
-                                                            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
-                                                            <Setter Property="Background" Value="#142232"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
+                        <TextBox x:Name="SearchTextBox"
+                                 Grid.Column="0"
+                                 Style="{StaticResource TextInputStyle}"
+                                 ToolTip="Search titles, categories, and content"
+                                 TextChanged="SearchTextBox_TextChanged"/>
 
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="Auto"/>
-                                                </Grid.RowDefinitions>
+                        <Button Grid.Column="1"
+                                Content="Clear Search"
+                                Margin="12,0,8,0"
+                                Style="{StaticResource ActionButtonStyle}"
+                                Click="ClearSearchButton_Click"/>
 
-                                                <Grid Grid.Row="0">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <TextBlock Text="{Binding Title}"
-                                                                   FontSize="16"
-                                                                   FontWeight="SemiBold"
-                                                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                                                   VerticalAlignment="Center"/>
-
-                                                        <Border Background="#162131"
-                                                                BorderBrush="#27405C"
-                                                                BorderThickness="1"
-                                                                CornerRadius="10"
-                                                                Padding="8,4"
-                                                                Margin="10,0,0,0">
-                                                            <TextBlock Text="{Binding Category}"
-                                                                       Foreground="{StaticResource TextPrimaryBrush}"
-                                                                       FontSize="11"
-                                                                       FontWeight="SemiBold"/>
-                                                        </Border>
-                                                    </StackPanel>
-
-                                                    <Border Grid.Column="1"
-                                                            Background="#101A27"
-                                                            BorderBrush="#243548"
-                                                            BorderThickness="1"
-                                                            CornerRadius="10"
-                                                            Padding="8,4">
-                                                        <TextBlock Text="{Binding PinStateLabel}"
-                                                                   Foreground="{StaticResource TextMutedBrush}"
-                                                                   FontSize="11"
-                                                                   FontWeight="SemiBold"/>
-                                                    </Border>
-                                                </Grid>
-
-                                                <TextBlock Grid.Row="1"
-                                                           Margin="0,14,0,14"
-                                                           Text="{Binding DisplayText}"
-                                                           TextWrapping="Wrap"
-                                                           Foreground="{StaticResource TextSoftBrush}"
-                                                           FontSize="14"
-                                                           LineHeight="22"/>
-
-                                                <Grid Grid.Row="2">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <StackPanel Orientation="Horizontal"
-                                                                VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding DateLabel}"
-                                                                   Foreground="{StaticResource TextMutedBrush}"
-                                                                   FontSize="12"/>
-                                                        <TextBlock Text=" • "
-                                                                   Foreground="{StaticResource TextMutedBrush}"
-                                                                   FontSize="12"/>
-                                                        <TextBlock Text="{Binding TimeLabel}"
-                                                                   Foreground="{StaticResource TextMutedBrush}"
-                                                                   FontSize="12"/>
-                                                    </StackPanel>
-
-                                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                                        <Button Content="Copy"
-                                                                Tag="{Binding Id}"
-                                                                Style="{StaticResource PrimaryButtonStyle}"
-                                                                Click="CopyItemButton_Click"/>
-
-                                                        <Button Content="{Binding PinButtonLabel}"
-                                                                Tag="{Binding Id}"
-                                                                Style="{StaticResource ActionButtonStyle}"
-                                                                Click="TogglePinButton_Click"/>
-
-                                                        <Button Content="Edit"
-                                                                Tag="{Binding Id}"
-                                                                Click="EditSnippetButton_Click">
-                                                            <Button.Style>
-                                                                <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-                                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding IsSnippet}" Value="True">
-                                                                            <Setter Property="Visibility" Value="Visible"/>
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </Button.Style>
-                                                        </Button>
-
-                                                        <Button Content="Delete"
-                                                                Tag="{Binding Id}"
-                                                                Style="{StaticResource DangerButtonStyle}"
-                                                                Margin="0,0,0,0"
-                                                                Click="DeleteItemButton_Click"/>
-                                                    </StackPanel>
-                                                </Grid>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
+                        <Button Grid.Column="2"
+                                Content="New Snippet"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                Click="NewSnippetButton_Click"/>
                     </Grid>
                 </Border>
 
-                <Border x:Name="SettingsContentPanel"
-        Visibility="Collapsed"
-        Background="{StaticResource PanelBrush}"
-        BorderBrush="{StaticResource CardBorderBrush}"
-        BorderThickness="1"
-        CornerRadius="22"
-        Padding="20">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="18"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <!-- Top row -->
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1.15*"/>
-                                    <ColumnDefinition Width="0.85*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <!-- General -->
-                                <Border Grid.Column="0"
-                        Margin="0,0,10,0"
-                        Background="{StaticResource CardBrush}"
-                        BorderBrush="{StaticResource CardBorderBrush}"
-                        BorderThickness="1"
-                        CornerRadius="18"
-                        Padding="22">
-                                    <StackPanel>
-                                        <TextBlock Text="General"
-                                   FontSize="20"
-                                   FontWeight="Bold"
-                                   Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                        <TextBlock Text="Core ClipVault behavior and local app preferences."
-                                   Margin="0,6,0,0"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   TextWrapping="Wrap"/>
-
-                                        <CheckBox x:Name="ChkLaunchOnStartup"
-                                  Content="Launch ClipVault on startup"
-                                  Margin="0,22,0,0"
-                                  Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                        <CheckBox x:Name="ChkClipboardMonitoring"
-                                  Content="Watch clipboard changes automatically"
-                                  Margin="0,10,0,0"
-                                  Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                        <CheckBox x:Name="ChkMinimizeToTray"
-                                  Content="Minimize to system tray"
-                                  Margin="0,10,0,0"
-                                  Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                        <CheckBox x:Name="ChkCloseToTray"
-                                  Content="Close to system tray instead of exiting"
-                                  Margin="0,10,0,0"
-                                  Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                        <TextBlock Text="Max history items"
-                                   Margin="0,22,0,8"
-                                   Foreground="{StaticResource TextMutedBrush}"/>
-
-                                        <TextBox x:Name="MaxHistoryItemsTextBox"
-                                 Width="220"
-                                 HorizontalAlignment="Left"
-                                 Style="{StaticResource TextInputStyle}"/>
-
-                                        <Border Margin="0,22,0,0"
-                                Background="#0F1823"
-                                BorderBrush="{StaticResource CardBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="14"
-                                Padding="14">
-                                            <StackPanel>
-                                                <TextBlock Text="Updates"
-                                           Foreground="{StaticResource TextMutedBrush}"
-                                           FontSize="12"/>
-                                                <TextBlock Text="ClipVault checks the official release feed built into this app."
-                                           Margin="0,6,0,0"
-                                           Foreground="{StaticResource TextPrimaryBrush}"
-                                           TextWrapping="Wrap"/>
-                                            </StackPanel>
-                                        </Border>
-
-                                        <Grid Margin="0,22,0,0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <TextBlock Text="Settings are stored locally in SQLite."
-                                       VerticalAlignment="Center"
+                <!-- Stats -->
+                <UniformGrid x:Name="StatsPanel"
+                             Grid.Row="2"
+                             Columns="3"
+                             Margin="0,0,0,18">
+                    <Border Style="{StaticResource SurfaceCardStyle}" Margin="0,0,12,0">
+                        <StackPanel>
+                            <TextBlock Text="Clipboard Items"
                                        Foreground="{StaticResource TextMutedBrush}"
-                                       TextWrapping="Wrap"/>
+                                       FontSize="12"/>
+                            <TextBlock Text="{Binding TotalCount}"
+                                       Margin="0,10,0,0"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="32"
+                                       FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
 
-                                            <Button Grid.Column="1"
-                                    Content="Save Settings"
-                                    Width="150"
-                                    Margin="16,0,0,0"
-                                    Style="{StaticResource PrimaryButtonStyle}"
-                                    Click="SaveSettingsButton_Click"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </Border>
+                    <Border Style="{StaticResource SurfaceCardStyle}" Margin="0,0,12,0">
+                        <StackPanel>
+                            <TextBlock Text="Pinned"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       FontSize="12"/>
+                            <TextBlock Text="{Binding PinnedCount}"
+                                       Margin="0,10,0,0"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="32"
+                                       FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
 
-                                <!-- Right column -->
-                                <Grid Grid.Column="1" Margin="10,0,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="14"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
+                    <Border Style="{StaticResource SurfaceCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Snippets"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       FontSize="12"/>
+                            <TextBlock Text="{Binding SnippetCount}"
+                                       Margin="0,10,0,0"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="32"
+                                       FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
 
-                                    <!-- Data & Backup -->
-                                    <Border Grid.Row="0"
-                            Background="{StaticResource CardBrush}"
+                <Grid Grid.Row="3">
+                    <!-- Clipboard content -->
+                    <Border x:Name="ClipboardContentPanel"
+                            Background="{StaticResource PanelBrush}"
                             BorderBrush="{StaticResource CardBorderBrush}"
                             BorderThickness="1"
-                            CornerRadius="18"
-                            Padding="22">
-                                        <StackPanel>
-                                            <TextBlock Text="Data &amp; Backup"
+                            CornerRadius="22"
+                            Padding="18">
+                        <Grid>
+                            <TextBlock x:Name="NoItemsText"
+                                       Text="Nothing to show here yet.&#10;Copy something, pin favorites, or create a snippet."
+                                       Visibility="Collapsed"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       TextAlignment="Center"
                                        FontSize="18"
-                                       FontWeight="Bold"
-                                       Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                            <TextBlock Text="Protect your local clipboard history, snippets, and app settings."
-                                       Margin="0,6,0,0"
                                        Foreground="{StaticResource TextMutedBrush}"
-                                       TextWrapping="Wrap"/>
+                                       LineHeight="28"/>
 
-                                            <WrapPanel Margin="0,18,0,0">
-                                                <Button Content="Export Backup"
-                                        Width="145"
-                                        Margin="0,0,10,10"
-                                        Style="{StaticResource ActionButtonStyle}"
-                                        Click="ExportBackupButton_Click"/>
+                            <ScrollViewer x:Name="ClipboardScroller"
+                                          VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding FilteredItems}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{StaticResource ItemCardStyle}">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
 
-                                                <Button Content="Import Backup"
-                                        Width="145"
-                                        Margin="0,0,0,10"
-                                        Style="{StaticResource ActionButtonStyle}"
-                                        Click="ImportBackupButton_Click"/>
+                                                    <!-- Title row -->
+                                                    <Grid Grid.Row="0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
 
-                                                <Button Content="Open Data Folder"
-                                        Width="145"
-                                        Margin="0,0,10,0"
-                                        Style="{StaticResource ActionButtonStyle}"
-                                        Click="OpenDataFolderButton_Click"/>
-                                            </WrapPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Title}"
+                                                                       FontSize="16"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                                                       VerticalAlignment="Center"/>
+
+                                                            <Border Background="{StaticResource PillBackgroundBrush}"
+                                                                    BorderBrush="{StaticResource PillBorderBrush}"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="11"
+                                                                    Padding="10,4"
+                                                                    Margin="12,0,0,0"
+                                                                    VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding PinStateLabel}"
+                                                                           Foreground="{StaticResource AccentStrongBrush}"
+                                                                           FontSize="11"
+                                                                           FontWeight="SemiBold"/>
+                                                            </Border>
+                                                        </StackPanel>
+                                                    </Grid>
+
+                                                    <!-- Preview -->
+                                                    <TextBlock Grid.Row="1"
+                                                               Margin="0,16,0,16"
+                                                               Text="{Binding DisplayText}"
+                                                               TextWrapping="Wrap"
+                                                               Foreground="{StaticResource TextSoftBrush}"
+                                                               FontSize="14"
+                                                               LineHeight="24"/>
+
+                                                    <!-- Metadata and actions -->
+                                                    <Grid Grid.Row="2">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <StackPanel Orientation="Horizontal"
+                                                                    VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding DateLabel}"
+                                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                                       FontSize="12"/>
+                                                            <TextBlock Text=" • "
+                                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                                       FontSize="12"/>
+                                                            <TextBlock Text="{Binding TimeLabel}"
+                                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                                       FontSize="12"/>
+                                                        </StackPanel>
+
+                                                        <WrapPanel Grid.Column="1"
+                                                                   HorizontalAlignment="Right"
+                                                                   VerticalAlignment="Center"
+                                                                   ItemHeight="36"
+                                                                   Margin="12,0,0,0">
+                                                            <Button Content="Copy"
+                                                                    Tag="{Binding Id}"
+                                                                    Style="{StaticResource PrimaryButtonStyle}"
+                                                                    Click="CopyItemButton_Click"/>
+
+                                                            <Button Content="{Binding PinButtonLabel}"
+                                                                    Tag="{Binding Id}"
+                                                                    Style="{StaticResource ActionButtonStyle}"
+                                                                    Click="TogglePinButton_Click"/>
+
+                                                            <Button Content="Edit"
+                                                                    Tag="{Binding Id}"
+                                                                    Click="EditSnippetButton_Click">
+                                                                <Button.Style>
+                                                                    <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsSnippet}" Value="True">
+                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Button.Style>
+                                                            </Button>
+
+                                                            <Button Content="Delete"
+                                                                    Tag="{Binding Id}"
+                                                                    Style="{StaticResource DangerButtonStyle}"
+                                                                    Margin="0"
+                                                                    Click="DeleteItemButton_Click"/>
+                                                        </WrapPanel>
+                                                    </Grid>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+
+                    <!-- Settings dashboard -->
+                    <Border x:Name="SettingsContentPanel"
+                            Visibility="Collapsed"
+                            Background="{StaticResource PanelBrush}"
+                            BorderBrush="{StaticResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="22"
+                            Padding="20">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="18"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Top cards -->
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1.15*"/>
+                                        <ColumnDefinition Width="0.85*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- General -->
+                                    <Border Grid.Column="0"
+                                            Margin="0,0,10,0"
+                                            Style="{StaticResource SurfaceCardStyle}"
+                                            Padding="22">
+                                        <StackPanel>
+                                            <TextBlock Text="General"
+                                                       FontSize="20"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                            <TextBlock Text="Core ClipVault behavior and local app preferences."
+                                                       Margin="0,6,0,0"
+                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                       TextWrapping="Wrap"/>
+
+                                            <CheckBox x:Name="ChkLaunchOnStartup"
+                                                      Content="Launch ClipVault on startup"
+                                                      Margin="0,22,0,0"
+                                                      Style="{StaticResource SettingCheckBoxStyle}"/>
+
+                                            <CheckBox x:Name="ChkClipboardMonitoring"
+                                                      Content="Watch clipboard changes automatically"
+                                                      Margin="0,10,0,0"
+                                                      Style="{StaticResource SettingCheckBoxStyle}"/>
+
+                                            <CheckBox x:Name="ChkMinimizeToTray"
+                                                      Content="Minimize to system tray"
+                                                      Margin="0,10,0,0"
+                                                      Style="{StaticResource SettingCheckBoxStyle}"/>
+
+                                            <CheckBox x:Name="ChkCloseToTray"
+                                                      Content="Close to system tray instead of exiting"
+                                                      Margin="0,10,0,0"
+                                                      Style="{StaticResource SettingCheckBoxStyle}"/>
+
+                                            <TextBlock Text="Max history items"
+                                                       Margin="0,22,0,8"
+                                                       Foreground="{StaticResource TextMutedBrush}"/>
+
+                                            <TextBox x:Name="MaxHistoryItemsTextBox"
+                                                     Width="220"
+                                                     HorizontalAlignment="Left"
+                                                     Style="{StaticResource TextInputStyle}"/>
+
+                                            <Border Margin="0,22,0,0"
+                                                    Background="#0F1823"
+                                                    BorderBrush="{StaticResource CardBorderBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="14"
+                                                    Padding="14">
+                                                <StackPanel>
+                                                    <TextBlock Text="Updates"
+                                                               Foreground="{StaticResource TextMutedBrush}"
+                                                               FontSize="12"/>
+                                                    <TextBlock Text="ClipVault checks the official release feed built into this app."
+                                                               Margin="0,6,0,0"
+                                                               Foreground="{StaticResource TextPrimaryBrush}"
+                                                               TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <Grid Margin="0,22,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Text="Settings are stored locally in SQLite."
+                                                           VerticalAlignment="Center"
+                                                           Foreground="{StaticResource TextMutedBrush}"
+                                                           TextWrapping="Wrap"/>
+
+                                                <Button Grid.Column="1"
+                                                        Content="Save Settings"
+                                                        Width="150"
+                                                        Margin="16,0,0,0"
+                                                        Style="{StaticResource PrimaryButtonStyle}"
+                                                        Click="SaveSettingsButton_Click"/>
+                                            </Grid>
                                         </StackPanel>
                                     </Border>
 
-                                    <!-- Updates + Maintenance -->
-                                    <Grid Grid.Row="2">
+                                    <!-- Tooling -->
+                                    <Grid Grid.Column="1" Margin="10,0,0,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="14"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Data and backup -->
+                                        <Border Grid.Row="0"
+                                                Style="{StaticResource SurfaceCardStyle}"
+                                                Padding="22">
+                                            <StackPanel>
+                                                <TextBlock Text="Data &amp; Backup"
+                                                           FontSize="18"
+                                                           FontWeight="Bold"
+                                                           Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                                <TextBlock Text="Protect your local clipboard history, snippets, and app settings."
+                                                           Margin="0,6,0,0"
+                                                           Foreground="{StaticResource TextMutedBrush}"
+                                                           TextWrapping="Wrap"/>
+
+                                                <WrapPanel Margin="0,18,0,0">
+                                                    <Button Content="Export Backup"
+                                                            Width="145"
+                                                            Margin="0,0,10,10"
+                                                            Style="{StaticResource ActionButtonStyle}"
+                                                            Click="ExportBackupButton_Click"/>
+
+                                                    <Button Content="Import Backup"
+                                                            Width="145"
+                                                            Margin="0,0,0,10"
+                                                            Style="{StaticResource ActionButtonStyle}"
+                                                            Click="ImportBackupButton_Click"/>
+
+                                                    <Button Content="Open Data Folder"
+                                                            Width="145"
+                                                            Margin="0,0,10,0"
+                                                            Style="{StaticResource ActionButtonStyle}"
+                                                            Click="OpenDataFolderButton_Click"/>
+                                                </WrapPanel>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Updates and maintenance -->
+                                        <Grid Grid.Row="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="12"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Updates -->
+                                            <Border Grid.Column="0"
+                                                    Style="{StaticResource SurfaceCardStyle}"
+                                                    Padding="20">
+                                                <StackPanel>
+                                                    <TextBlock Text="Updates"
+                                                               FontSize="18"
+                                                               FontWeight="Bold"
+                                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                                    <TextBlock Text="Stay current and review what changed."
+                                                               Margin="0,6,0,0"
+                                                               Foreground="{StaticResource TextMutedBrush}"
+                                                               TextWrapping="Wrap"/>
+
+                                                    <Button Content="Check for Updates"
+                                                            Margin="0,18,0,0"
+                                                            Width="160"
+                                                            Style="{StaticResource PrimaryButtonStyle}"
+                                                            Click="CheckForUpdatesButton_Click"/>
+
+                                                    <Button Content="View Changelog"
+                                                            Margin="0,10,0,0"
+                                                            Width="160"
+                                                            Style="{StaticResource ActionButtonStyle}"
+                                                            Click="ViewCurrentChangelogButton_Click"/>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <!-- Maintenance -->
+                                            <Border Grid.Column="2"
+                                                    Style="{StaticResource SurfaceCardStyle}"
+                                                    Padding="20">
+                                                <StackPanel>
+                                                    <TextBlock Text="Maintenance"
+                                                               FontSize="18"
+                                                               FontWeight="Bold"
+                                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                                    <TextBlock Text="Logs, cleanup tools, and local diagnostics."
+                                                               Margin="0,6,0,0"
+                                                               Foreground="{StaticResource TextMutedBrush}"
+                                                               TextWrapping="Wrap"/>
+
+                                                    <Button Content="View Current Log"
+                                                            Margin="0,18,0,0"
+                                                            Width="150"
+                                                            Style="{StaticResource ActionButtonStyle}"
+                                                            Click="OpenLogViewerButton_Click"/>
+
+                                                    <Button Content="Open Logs Folder"
+                                                            Margin="0,10,0,0"
+                                                            Width="150"
+                                                            Style="{StaticResource ActionButtonStyle}"
+                                                            Click="OpenLogsFolderButton_Click"/>
+
+                                                    <Button Content="Clear Non-Pinned History"
+                                                            Margin="0,10,0,0"
+                                                            Padding="18,10"
+                                                            MinWidth="230"
+                                                            HorizontalAlignment="Left"
+                                                            Style="{StaticResource DangerButtonStyle}"
+                                                            Click="ClearHistoryButton_Click"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+
+                                <!-- Storage info -->
+                                <Border Grid.Row="2"
+                                        Style="{StaticResource SurfaceCardStyle}"
+                                        Padding="20">
+                                    <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="12"/>
+                                            <ColumnDefinition Width="24"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <!-- Updates -->
-                                        <Border Grid.Column="0"
-                                Background="{StaticResource CardBrush}"
-                                BorderBrush="{StaticResource CardBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="18"
-                                Padding="20">
-                                            <StackPanel>
-                                                <TextBlock Text="Updates"
-                                           FontSize="18"
-                                           FontWeight="Bold"
-                                           Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Database"
+                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                       FontSize="12"/>
+                                            <TextBlock Text="{Binding DatabasePath}"
+                                                       Margin="0,8,0,0"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                                       TextWrapping="Wrap"/>
+                                        </StackPanel>
 
-                                                <TextBlock Text="Stay current and review what changed."
-                                           Margin="0,6,0,0"
-                                           Foreground="{StaticResource TextMutedBrush}"
-                                           TextWrapping="Wrap"/>
-
-                                                <Button Content="Check for Updates"
-                                        Margin="0,18,0,0"
-                                        Width="160"
-                                        Style="{StaticResource PrimaryButtonStyle}"
-                                        Click="CheckForUpdatesButton_Click"/>
-
-                                                <Button Content="View Changelog"
-                                        Margin="0,10,0,0"
-                                        Width="160"
-                                        Style="{StaticResource ActionButtonStyle}"
-                                        Click="ViewCurrentChangelogButton_Click"/>
-                                            </StackPanel>
-                                        </Border>
-
-                                        <!-- Maintenance -->
-                                        <Border Grid.Column="2"
-                                Background="{StaticResource CardBrush}"
-                                BorderBrush="{StaticResource CardBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="18"
-                                Padding="20">
-                                            <StackPanel>
-                                                <TextBlock Text="Maintenance"
-                                           FontSize="18"
-                                           FontWeight="Bold"
-                                           Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                                <TextBlock Text="Logs, cleanup tools, and local diagnostics."
-                                           Margin="0,6,0,0"
-                                           Foreground="{StaticResource TextMutedBrush}"
-                                           TextWrapping="Wrap"/>
-
-                                                <Button Content="View Current Log"
-                                        Margin="0,18,0,0"
-                                        Width="150"
-                                        Style="{StaticResource ActionButtonStyle}"
-                                        Click="OpenLogViewerButton_Click"/>
-
-                                                <Button Content="Open Logs Folder"
-                                        Margin="0,10,0,0"
-                                        Width="150"
-                                        Style="{StaticResource ActionButtonStyle}"
-                                        Click="OpenLogsFolderButton_Click"/>
-
-                                                <Button Content="Clear Non-Pinned History"
-        Margin="0,10,0,0"
-        Padding="18,10"
-        MinWidth="220"
-        HorizontalAlignment="Left"
-        Style="{StaticResource DangerButtonStyle}"
-        Click="ClearHistoryButton_Click"/>
-                                            </StackPanel>
-                                        </Border>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Current log"
+                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                       FontSize="12"/>
+                                            <TextBlock Text="{Binding CurrentLogPath}"
+                                                       Margin="0,8,0,0"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                                       TextWrapping="Wrap"/>
+                                        </StackPanel>
                                     </Grid>
-                                </Grid>
+                                </Border>
                             </Grid>
-
-                            <!-- Bottom info card -->
-                            <Border Grid.Row="2"
-                    Background="{StaticResource CardBrush}"
-                    BorderBrush="{StaticResource CardBorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="18"
-                    Padding="20">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="24"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="Database"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="12"/>
-                                        <TextBlock Text="{Binding DatabasePath}"
-                                   Margin="0,8,0,0"
-                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                   TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="2">
-                                        <TextBlock Text="Current log"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="12"/>
-                                        <TextBlock Text="{Binding CurrentLogPath}"
-                                   Margin="0,8,0,0"
-                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                   TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </Grid>
-                    </ScrollViewer>
-                </Border>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>

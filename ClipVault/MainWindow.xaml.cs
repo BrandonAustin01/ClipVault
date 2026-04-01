@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using WpfBrush = System.Windows.Media.Brush;
 using WpfBrushes = System.Windows.Media.Brushes;
 using WpfButton = System.Windows.Controls.Button;
-using WpfMessageBox = System.Windows.MessageBox;
 using WpfOpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using WpfSaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
@@ -842,7 +841,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             string itemType = item.IsSnippet ? "snippet" : "clipboard item";
 
-            var result = WpfMessageBox.Show(
+            var result = DialogService.Show(
                 $"Delete this {itemType}?{Environment.NewLine}{Environment.NewLine}\"{item.Title}\"",
                 "ClipVault",
                 MessageBoxButton.YesNo,
@@ -928,7 +927,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 case UpdateCheckState.NoFeedConfigured:
                     StatusMessage = "The update feed is not configured in this build.";
-                    WpfMessageBox.Show(
+                    DialogService.Show(
                         "The update feed is not configured in this build.",
                         "ClipVault",
                         MessageBoxButton.OK,
@@ -937,7 +936,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 case UpdateCheckState.NotInstalled:
                     StatusMessage = "Updates only work from an installed ClipVault build.";
-                    WpfMessageBox.Show(
+                    DialogService.Show(
                         "ClipVault is not running from a Velopack-installed build yet." + Environment.NewLine + Environment.NewLine +
                         "This is expected if you launched it from Visual Studio, bin\\Release, or a loose publish folder. " +
                         "Install the packaged Setup.exe build first, then update checks will work.",
@@ -950,7 +949,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     StatusMessage = string.IsNullOrWhiteSpace(result.CurrentVersion)
                         ? "ClipVault is already up to date."
                         : $"ClipVault is already up to date ({result.CurrentVersion}).";
-                    WpfMessageBox.Show(
+                    DialogService.Show(
                         StatusMessage,
                         "ClipVault",
                         MessageBoxButton.OK,
@@ -961,7 +960,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case UpdateCheckState.UpdateReadyToApply:
                     StatusMessage = $"Update {result.TargetVersion} is ready to install.";
 
-                    var promptResult = WpfMessageBox.Show(
+                    var promptResult = DialogService.Show(
                         $"Update {result.TargetVersion} is ready.{Environment.NewLine}{Environment.NewLine}" +
                         $"Current version: {result.CurrentVersion ?? DisplayVersion}{Environment.NewLine}" +
                         $"New version: {result.TargetVersion}{Environment.NewLine}{Environment.NewLine}" +
@@ -1007,7 +1006,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             LogService.Error(ex, "Update check failed.");
             StatusMessage = "Update check failed. Check the log.";
 
-            WpfMessageBox.Show(
+            DialogService.Show(
                 $"ClipVault could not finish checking for updates.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                 "ClipVault Update Error",
                 MessageBoxButton.OK,
@@ -1023,7 +1022,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         RunGuarded(() =>
         {
-            var result = WpfMessageBox.Show(
+            var result = DialogService.Show(
                 "Clear all non-pinned clipboard history? Pinned items and snippets will be kept.",
                 "ClipVault",
                 MessageBoxButton.YesNo,
@@ -1189,11 +1188,46 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 return;
             }
 
-            var document = _backupService.LoadFromFile(dialog.FileName);
-            var importedSettings = _backupService.ToAppSettings(document);
-            var importedItems = _backupService.ToClipboardEntries(document);
+            BackupDocument document;
+            AppSettings importedSettings;
+            List<ClipboardEntry> importedItems;
 
-            var confirmResult = WpfMessageBox.Show(
+            try
+            {
+                document = _backupService.LoadFromFile(dialog.FileName);
+                importedSettings = _backupService.ToAppSettings(document);
+                importedItems = _backupService.ToClipboardEntries(document);
+            }
+            catch (System.Text.Json.JsonException ex)
+            {
+                LogService.Warn($"Invalid backup JSON selected for import: {dialog.FileName}");
+                LogService.Error(ex, "Backup import rejected because the file is not valid JSON.");
+
+                StatusMessage = "That file is not a valid ClipVault backup.";
+                DialogService.Show(
+                    "That file is not a valid ClipVault backup." + Environment.NewLine + Environment.NewLine +
+                    "Please choose a backup file exported from ClipVault.",
+                    "ClipVault Import Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+            catch (InvalidOperationException ex)
+            {
+                LogService.Warn($"Invalid backup file selected for import: {dialog.FileName}");
+                LogService.Error(ex, "Backup import rejected because the file failed validation.");
+
+                StatusMessage = "That file could not be imported as a ClipVault backup.";
+                DialogService.Show(
+                    "That file could not be imported as a ClipVault backup." + Environment.NewLine + Environment.NewLine +
+                    ex.Message,
+                    "ClipVault Import Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            var confirmResult = DialogService.Show(
                 $"Import this ClipVault backup?{Environment.NewLine}{Environment.NewLine}" +
                 $"This will replace your current local ClipVault data.{Environment.NewLine}{Environment.NewLine}" +
                 $"Items in backup: {importedItems.Count}{Environment.NewLine}" +

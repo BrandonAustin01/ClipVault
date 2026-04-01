@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using ClipVault.Services;
-using WpfMessageBox = System.Windows.MessageBox;
 using WpfClipboard = System.Windows.Clipboard;
 
 namespace ClipVault;
@@ -69,7 +68,7 @@ public partial class LogViewerWindow : Window
         catch (Exception ex)
         {
             LogService.Error(ex, "Failed to copy log text.");
-            WpfMessageBox.Show(
+            DialogService.Show(
                 $"Could not copy the current log view.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                 "ClipVault",
                 MessageBoxButton.OK,
@@ -101,7 +100,7 @@ public partial class LogViewerWindow : Window
         catch (Exception ex)
         {
             LogService.Error(ex, "Failed to open logs folder from the log viewer.");
-            WpfMessageBox.Show(
+            DialogService.Show(
                 $"Could not open the logs folder.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                 "ClipVault",
                 MessageBoxButton.OK,
@@ -139,7 +138,7 @@ public partial class LogViewerWindow : Window
         catch (Exception ex)
         {
             LogService.Error(ex, "Failed to refresh the log viewer.");
-            WpfMessageBox.Show(
+            DialogService.Show(
                 $"Could not load the log file.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
                 "ClipVault",
                 MessageBoxButton.OK,
