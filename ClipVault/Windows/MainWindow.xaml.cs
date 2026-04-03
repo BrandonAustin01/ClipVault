@@ -7,16 +7,20 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using ClipVault.Models;
 using ClipVault.Services;
 using ClipVault.Helpers;
 using Microsoft.Win32;
 using System.Collections.Generic;
+using WpfColorConverter = System.Windows.Media.ColorConverter;
+using WpfColor = System.Windows.Media.Color;
 using WpfBrush = System.Windows.Media.Brush;
 using WpfBrushes = System.Windows.Media.Brushes;
 using WpfButton = System.Windows.Controls.Button;
 using WpfOpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using WpfSaveFileDialog = Microsoft.Win32.SaveFileDialog;
+using WpfComboBox = System.Windows.Controls.ComboBox;
 
 namespace ClipVault;
 
@@ -42,21 +46,28 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private string _currentSectionSubtitle = "Your recent copied items will live here.";
     private string _statusMessage = "Starting ClipVault...";
     private string? _suppressedClipboardTextNormalized;
+    public string DatabasePath => _storageService.DatabaseFilePath;
+    public string CurrentLogPath => LogService.CurrentLogFilePath;
+    public string DisplayVersion => _displayVersion;
 
     private int _totalCount;
     private int _pinnedCount;
     private int _snippetCount;
-    
+
     private DateTime _suppressedClipboardUntilUtc = DateTime.MinValue;
     private LogViewerWindow? _logViewerWindow;
 
     public ObservableCollection<ClipboardEntry> AllItems { get; } = new();
     public ObservableCollection<ClipboardEntry> FilteredItems { get; } = new();
 
-    public string DatabasePath => _storageService.DatabaseFilePath;
-
-    public string CurrentLogPath => LogService.CurrentLogFilePath;
-    public string DisplayVersion => _displayVersion;
+    private sealed record ThemePalette(
+    Dictionary<string, string> Brushes,
+    string SidebarHeaderStart,
+    string SidebarHeaderEnd,
+    string TopGlowStart,
+    string TopGlowEnd,
+    string BottomGlowStart,
+    string BottomGlowEnd);
 
     public string CurrentSectionTitle
     {
@@ -156,7 +167,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             InitializePersistence();
             LoadPersistedItems();
             ApplySettingsToUi();
-
+            ApplyTheme(_appSettings.Theme);
             SetSection("History");
             UpdateStats();
 
@@ -278,6 +289,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ChkMinimizeToTray.IsChecked = _appSettings.MinimizeToTray;
         ChkCloseToTray.IsChecked = _appSettings.CloseToTray;
         MaxHistoryItemsTextBox.Text = _appSettings.MaxHistoryItems.ToString();
+
+        if (ThemeComboBox is not null)
+        {
+            ThemeComboBox.SelectedValue = NormalizeThemeName(_appSettings.Theme);
+        }
     }
 
     private void ApplyClipboardMonitoringSetting()
@@ -703,6 +719,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void NewSnippetButton_Click(object sender, RoutedEventArgs e)
     {
+        StatusMessage = "Opening snippet editor...";
+
         RunGuarded(() =>
         {
             var editor = new SnippetEditorWindow
@@ -739,6 +757,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void EditSnippetButton_Click(object sender, RoutedEventArgs e)
     {
+        StatusMessage = "Opening snippet editor...";
+
         RunGuarded(() =>
         {
             var item = FindEntryFromButton(sender);
@@ -882,6 +902,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             _appSettings.MinimizeToTray = ChkMinimizeToTray.IsChecked == true;
             _appSettings.CloseToTray = ChkCloseToTray.IsChecked == true;
             _appSettings.MaxHistoryItems = maxHistoryItems;
+            _appSettings.Theme = NormalizeThemeName(ThemeComboBox.SelectedValue as string ?? ThemeComboBox.Text);
+
+            ApplyTheme(_appSettings.Theme);
 
             _startupService.SetStartupEnabled(_appSettings.LaunchOnStartup);
             _storageService.SaveAppSettings(_appSettings);
@@ -1129,6 +1152,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         LoadPersistedItems();
         ApplySettingsToUi();
+        ApplyTheme(_appSettings.Theme);
         ApplyClipboardMonitoringSetting();
         ApplyTrayVisibility();
         ApplyFilter();
@@ -1251,5 +1275,306 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             StatusMessage = $"Imported backup with {importedItems.Count} item(s).";
             LogService.Info($"Backup imported from {dialog.FileName}");
         }, "Backup import");
+    }
+
+    private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded)
+            return;
+
+        if (sender is not WpfComboBox comboBox || comboBox.SelectedValue is not string selectedTheme)
+            return;
+
+        string normalizedTheme = NormalizeThemeName(selectedTheme);
+        ApplyTheme(normalizedTheme);
+        StatusMessage = $"Previewing {normalizedTheme} theme. Save settings to keep it.";
+    }
+
+    private void ApplyTheme(string? themeName)
+    {
+        string normalizedTheme = NormalizeThemeName(themeName);
+        ThemePalette palette = GetThemePalette(normalizedTheme);
+
+        foreach (var pair in palette.Brushes)
+        {
+            SetBrushColor(pair.Key, pair.Value);
+        }
+
+        SetGradientStops("SidebarHeaderGlowBrush", palette.SidebarHeaderStart, palette.SidebarHeaderEnd);
+        SetGradientStops("TopGlowBrush", palette.TopGlowStart, palette.TopGlowEnd);
+        SetGradientStops("BottomGlowBrush", palette.BottomGlowStart, palette.BottomGlowEnd);
+
+        Background = (WpfBrush)FindResource("AppBackgroundBrush");
+        _appSettings.Theme = normalizedTheme;
+
+        if (ThemeComboBox is not null && !Equals(ThemeComboBox.SelectedValue, normalizedTheme))
+        {
+            ThemeComboBox.SelectedValue = normalizedTheme;
+        }
+    }
+
+    private static string NormalizeThemeName(string? themeName)
+    {
+        if (string.IsNullOrWhiteSpace(themeName))
+            return "Midnight";
+
+        return themeName.Trim() switch
+        {
+            "Dark" => "Midnight",
+            "Midnight" => "Midnight",
+            "Graphite" => "Graphite",
+            "Aurora" => "Aurora",
+            _ => "Midnight"
+        };
+    }
+
+    private static ThemePalette GetThemePalette(string themeName)
+    {
+        return themeName switch
+        {
+            "Graphite" => new ThemePalette(
+                new Dictionary<string, string>
+                {
+                    ["AppBackgroundBrush"] = "#0D1014",
+                    ["SidebarBrush"] = "#12161B",
+                    ["PanelBrush"] = "#141920",
+                    ["CardBrush"] = "#182028",
+                    ["CardHoverBrush"] = "#1D2731",
+                    ["CardBorderBrush"] = "#2C3947",
+                    ["CardBorderHoverBrush"] = "#45576B",
+                    ["AccentBrush"] = "#9AB0C9",
+                    ["AccentStrongBrush"] = "#C7D4E2",
+                    ["AccentSoftBrush"] = "#1E2935",
+                    ["AccentSoftHoverBrush"] = "#273545",
+                    ["TextPrimaryBrush"] = "#F3F7FB",
+                    ["TextMutedBrush"] = "#9AA9BA",
+                    ["TextSoftBrush"] = "#C1CCD8",
+                    ["SidebarSelectedBrush"] = "#1E2935",
+                    ["DangerBrush"] = "#6F2630",
+                    ["DangerHoverBrush"] = "#87303A",
+                    ["DangerBorderBrush"] = "#A24755",
+                    ["InputBackgroundBrush"] = "#11171D",
+                    ["InputBorderBrush"] = "#334252",
+                    ["InputBorderHoverBrush"] = "#4B5E74",
+                    ["PillBackgroundBrush"] = "#1B2632",
+                    ["PillBorderBrush"] = "#40556D",
+                    ["PinnedCardBrush"] = "#1A2633",
+                    ["PinnedBorderBrush"] = "#8FA7C1",
+                    ["ScrollTrackBrush"] = "#111821",
+                    ["ScrollThumbBrush"] = "#3B4D61",
+                    ["ScrollThumbHoverBrush"] = "#4B627B",
+                    ["ScrollThumbPressedBrush"] = "#5E7A99",
+                    ["SidebarHoverBrush"] = "#1A2430",
+                    ["SidebarHoverBorderBrush"] = "#334354",
+                    ["SidebarPressedBrush"] = "#223041",
+                    ["SidebarPressedBorderBrush"] = "#4C6179",
+                    ["ActionButtonBackgroundBrush"] = "#1B2632",
+                    ["ActionButtonBorderBrush"] = "#334252",
+                    ["ActionButtonHoverBrush"] = "#243243",
+                    ["ActionButtonHoverBorderBrush"] = "#4A5E75",
+                    ["ActionButtonPressedBrush"] = "#2A3A4D",
+                    ["PrimaryButtonBorderBrush"] = "#7E95AD",
+                    ["PrimaryButtonPressedBrush"] = "#2B3B4C",
+                    ["DangerHoverBorderBrush"] = "#BF5A69",
+                    ["DangerPressedBrush"] = "#6C2630",
+                    ["SidebarOuterBorderBrush"] = "#202A35",
+                    ["SidebarHeaderBorderBrush"] = "#324352",
+                    ["StorageBadgeBackgroundBrush"] = "#1C2A3A",
+                    ["StorageBadgeBorderBrush"] = "#546B83",
+                    ["StorageBadgeShadowBrush"] = "#0B1118",
+                    ["ComboBoxPopupBrush"] = "#141920",
+                    ["ComboBoxPopupBorderBrush"] = "#2C3947"
+                },
+                "#263544",
+                "#12161B",
+                "#2C3D52",
+                "#002C3D52",
+                "#1E2A38",
+                "#001E2A38"),
+
+            "Aurora" => new ThemePalette(
+                new Dictionary<string, string>
+                {
+                    ["AppBackgroundBrush"] = "#071216",
+                    ["SidebarBrush"] = "#0C171B",
+                    ["PanelBrush"] = "#0E1B20",
+                    ["CardBrush"] = "#112128",
+                    ["CardHoverBrush"] = "#15303A",
+                    ["CardBorderBrush"] = "#21444E",
+                    ["CardBorderHoverBrush"] = "#2F6775",
+                    ["AccentBrush"] = "#4FD7C4",
+                    ["AccentStrongBrush"] = "#87EBDD",
+                    ["AccentSoftBrush"] = "#13343B",
+                    ["AccentSoftHoverBrush"] = "#18434C",
+                    ["TextPrimaryBrush"] = "#F3FCFB",
+                    ["TextMutedBrush"] = "#95B7BC",
+                    ["TextSoftBrush"] = "#C3DADF",
+                    ["SidebarSelectedBrush"] = "#13343B",
+                    ["DangerBrush"] = "#6F2630",
+                    ["DangerHoverBrush"] = "#87303A",
+                    ["DangerBorderBrush"] = "#A24755",
+                    ["InputBackgroundBrush"] = "#0C171B",
+                    ["InputBorderBrush"] = "#2A5863",
+                    ["InputBorderHoverBrush"] = "#398091",
+                    ["PillBackgroundBrush"] = "#123039",
+                    ["PillBorderBrush"] = "#2E6875",
+                    ["PinnedCardBrush"] = "#102A31",
+                    ["PinnedBorderBrush"] = "#58D7C7",
+                    ["ScrollTrackBrush"] = "#0D171C",
+                    ["ScrollThumbBrush"] = "#2B5A65",
+                    ["ScrollThumbHoverBrush"] = "#377583",
+                    ["ScrollThumbPressedBrush"] = "#4592A4",
+                    ["SidebarHoverBrush"] = "#11303A",
+                    ["SidebarHoverBorderBrush"] = "#24505A",
+                    ["SidebarPressedBrush"] = "#16414A",
+                    ["SidebarPressedBorderBrush"] = "#327281",
+                    ["ActionButtonBackgroundBrush"] = "#123039",
+                    ["ActionButtonBorderBrush"] = "#24505A",
+                    ["ActionButtonHoverBrush"] = "#18424B",
+                    ["ActionButtonHoverBorderBrush"] = "#327281",
+                    ["ActionButtonPressedBrush"] = "#1D4E59",
+                    ["PrimaryButtonBorderBrush"] = "#4FD7C4",
+                    ["PrimaryButtonPressedBrush"] = "#1B4B53",
+                    ["DangerHoverBorderBrush"] = "#BF5A69",
+                    ["DangerPressedBrush"] = "#6C2630",
+                    ["SidebarOuterBorderBrush"] = "#163038",
+                    ["SidebarHeaderBorderBrush"] = "#27515C",
+                    ["StorageBadgeBackgroundBrush"] = "#11303A",
+                    ["StorageBadgeBorderBrush"] = "#3A8090",
+                    ["StorageBadgeShadowBrush"] = "#071216",
+                    ["ComboBoxPopupBrush"] = "#0E1B20",
+                    ["ComboBoxPopupBorderBrush"] = "#21444E"
+                },
+                "#184C57",
+                "#0C171B",
+                "#186873",
+                "#00186873",
+                "#114952",
+                "#00114952"),
+
+            _ => new ThemePalette(
+                new Dictionary<string, string>
+                {
+                    ["AppBackgroundBrush"] = "#0B1118",
+                    ["SidebarBrush"] = "#0F1722",
+                    ["PanelBrush"] = "#101925",
+                    ["CardBrush"] = "#121C28",
+                    ["CardHoverBrush"] = "#152233",
+                    ["CardBorderBrush"] = "#223040",
+                    ["CardBorderHoverBrush"] = "#33506F",
+                    ["AccentBrush"] = "#4EA1FF",
+                    ["AccentStrongBrush"] = "#6AB2FF",
+                    ["AccentSoftBrush"] = "#162437",
+                    ["AccentSoftHoverBrush"] = "#1B3047",
+                    ["TextPrimaryBrush"] = "#F3F7FB",
+                    ["TextMutedBrush"] = "#95A7BC",
+                    ["TextSoftBrush"] = "#B9C6D5",
+                    ["SidebarSelectedBrush"] = "#162437",
+                    ["DangerBrush"] = "#6F2630",
+                    ["DangerHoverBrush"] = "#87303A",
+                    ["DangerBorderBrush"] = "#A24755",
+                    ["InputBackgroundBrush"] = "#0E1620",
+                    ["InputBorderBrush"] = "#263547",
+                    ["InputBorderHoverBrush"] = "#37506A",
+                    ["PillBackgroundBrush"] = "#162334",
+                    ["PillBorderBrush"] = "#29435D",
+                    ["PinnedCardBrush"] = "#142334",
+                    ["PinnedBorderBrush"] = "#4A86C7",
+                    ["ScrollTrackBrush"] = "#0F1823",
+                    ["ScrollThumbBrush"] = "#2A4159",
+                    ["ScrollThumbHoverBrush"] = "#365674",
+                    ["ScrollThumbPressedBrush"] = "#46719A",
+                    ["SidebarHoverBrush"] = "#142131",
+                    ["SidebarHoverBorderBrush"] = "#24384C",
+                    ["SidebarPressedBrush"] = "#1A2D42",
+                    ["SidebarPressedBorderBrush"] = "#36506D",
+                    ["ActionButtonBackgroundBrush"] = "#162131",
+                    ["ActionButtonBorderBrush"] = "#243548",
+                    ["ActionButtonHoverBrush"] = "#1C2D43",
+                    ["ActionButtonHoverBorderBrush"] = "#35506E",
+                    ["ActionButtonPressedBrush"] = "#223854",
+                    ["PrimaryButtonBorderBrush"] = "#315A87",
+                    ["PrimaryButtonPressedBrush"] = "#25425F",
+                    ["DangerHoverBorderBrush"] = "#BF5A69",
+                    ["DangerPressedBrush"] = "#6C2630",
+                    ["SidebarOuterBorderBrush"] = "#182433",
+                    ["SidebarHeaderBorderBrush"] = "#263B52",
+                    ["StorageBadgeBackgroundBrush"] = "#132338",
+                    ["StorageBadgeBorderBrush"] = "#355B84",
+                    ["StorageBadgeShadowBrush"] = "#0B1623",
+                    ["ComboBoxPopupBrush"] = "#101925",
+                    ["ComboBoxPopupBorderBrush"] = "#223040"
+                },
+                "#1A2B40",
+                "#0F1722",
+                "#16365B",
+                "#0016365B",
+                "#11263F",
+                "#0011263F")
+        };
+    }
+
+    private void SetBrushColor(string resourceKey, string hexColor)
+    {
+        if (FindResource(resourceKey) is SolidColorBrush brush)
+        {
+            brush.Color = ParseColor(hexColor);
+        }
+    }
+
+    private void SetGradientStops(string resourceKey, string firstColor, string secondColor)
+    {
+        if (FindResource(resourceKey) is GradientBrush gradientBrush && gradientBrush.GradientStops.Count >= 2)
+        {
+            gradientBrush.GradientStops[0].Color = ParseColor(firstColor);
+            gradientBrush.GradientStops[1].Color = ParseColor(secondColor);
+        }
+    }
+
+    private static WpfColor ParseColor(string hexColor)
+    {
+        return (WpfColor)WpfColorConverter.ConvertFromString(hexColor)!;
+    }
+
+    private void OpenGitHubButton_Click(object sender, RoutedEventArgs e)
+    {
+        RunGuarded(() =>
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://github.com/BrandonAustin01/ClipVault",
+                UseShellExecute = true
+            });
+
+            StatusMessage = "Opened ClipVault GitHub.";
+        }, "Open GitHub");
+    }
+
+    private void OpenWebsiteButton_Click(object sender, RoutedEventArgs e)
+    {
+        RunGuarded(() =>
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://brandonmckinney.dev/clipvault",
+                UseShellExecute = true
+            });
+
+            StatusMessage = "Opened ClipVault website.";
+        }, "Open website");
+    }
+
+    private void OpenCreditsButton_Click(object sender, RoutedEventArgs e)
+    {
+        RunGuarded(() =>
+        {
+            DialogService.Show(
+                "ClipVault\n\nCreated by Brandon McKinney.\nBuilt with WPF, SQLite, and Velopack.\n\nSpecial thanks to:\nStackOverflow\nReddit",
+                "ClipVault Credits",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+
+            StatusMessage = "Opened credits.";
+        }, "Open credits");
     }
 }

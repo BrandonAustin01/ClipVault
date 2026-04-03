@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using ClipVault.Helpers;
 using ClipVault.Services;
 using Velopack;
 using WpfApplication = System.Windows.Application;
@@ -23,6 +24,43 @@ public partial class App : WpfApplication
                 catch
                 {
                     // Never let updater hooks break startup.
+                }
+            })
+            .OnRestarted(version =>
+            {
+                try
+                {
+                    string currentVersion = Convert.ToString(version)?.Trim() ?? string.Empty;
+
+                    LogService.Info($"ClipVault was restarted by Velopack after updating to version {currentVersion}.");
+
+                    if (!PostUpdateExperienceService.HasPendingAnnouncement())
+                    {
+                        string changelogText = ChangelogCatalog.BuildChangesSince(null, currentVersion);
+
+                        PostUpdateExperienceService.QueueAnnouncement(
+                            string.Empty,
+                            currentVersion,
+                            changelogText);
+
+                        LogService.Info(
+                            $"Queued fallback post-update announcement from Velopack restart hook for version {currentVersion}.");
+                    }
+                    else
+                    {
+                        LogService.Info("A post-update announcement was already queued before restart.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    try
+                    {
+                        LogService.Error(ex, "Failed to queue fallback post-update announcement from Velopack restart hook.");
+                    }
+                    catch
+                    {
+                        // Never let updater hooks break startup.
+                    }
                 }
             })
             .Run();
@@ -49,6 +87,7 @@ public partial class App : WpfApplication
             {
                 try
                 {
+                    LogService.Info("Running startup check for a pending post-update announcement.");
                     PostUpdateExperienceService.ShowPendingAnnouncement(mainWindow);
                 }
                 catch (Exception ex)

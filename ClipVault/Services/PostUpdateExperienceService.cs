@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Text.Json;
 using System.Windows;
 
@@ -30,59 +28,114 @@ namespace ClipVault.Services
         private static string PendingAnnouncementPath =>
             Path.Combine(AppDataFolder, "pending-update-announcement.json");
 
+        public static bool HasPendingAnnouncement()
+        {
+            try
+            {
+                return File.Exists(PendingAnnouncementPath);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static void QueueAnnouncement(
             string? previousVersion,
             string? currentVersion,
             string changelogText)
         {
-            Directory.CreateDirectory(AppDataFolder);
-
-            var payload = new PostUpdateAnnouncement
+            try
             {
-                PreviousVersion = previousVersion?.Trim() ?? string.Empty,
-                CurrentVersion = currentVersion?.Trim() ?? string.Empty,
-                ChangelogText = changelogText?.Trim() ?? string.Empty,
-                CreatedUtc = DateTime.UtcNow
-            };
+                Directory.CreateDirectory(AppDataFolder);
 
-            string json = JsonSerializer.Serialize(payload, JsonOptions);
-            File.WriteAllText(PendingAnnouncementPath, json);
+                var payload = new PostUpdateAnnouncement
+                {
+                    PreviousVersion = previousVersion?.Trim() ?? string.Empty,
+                    CurrentVersion = currentVersion?.Trim() ?? string.Empty,
+                    ChangelogText = changelogText?.Trim() ?? string.Empty,
+                    CreatedUtc = DateTime.UtcNow
+                };
+
+                string json = JsonSerializer.Serialize(payload, JsonOptions);
+                File.WriteAllText(PendingAnnouncementPath, json);
+
+                LogService.Info(
+                    $"Queued post-update announcement at '{PendingAnnouncementPath}'. " +
+                    $"Previous='{payload.PreviousVersion}', Current='{payload.CurrentVersion}'.");
+            }
+            catch (Exception ex)
+            {
+                LogService.Error(ex, "Failed to queue the post-update announcement.");
+                throw;
+            }
         }
 
         public static void ShowPendingAnnouncement(Window owner)
         {
-            if (!TryConsumeAnnouncement(out PostUpdateAnnouncement? announcement) || announcement is null)
-                return;
+            if (owner is null)
+                throw new ArgumentNullException(nameof(owner));
 
-            var window = new UpdateAnnouncementWindow(announcement)
+            LogService.Info($"Checking for pending post-update announcement at '{PendingAnnouncementPath}'.");
+
+            PostUpdateAnnouncement? announcement = TryReadAnnouncement();
+            if (announcement is null)
             {
-                Owner = owner
-            };
-
-            window.ShowDialog();
-        }
-
-        private static bool TryConsumeAnnouncement(out PostUpdateAnnouncement? announcement)
-        {
-            announcement = null;
+                LogService.Info("No pending post-update announcement was found.");
+                return;
+            }
 
             try
             {
-                if (!File.Exists(PendingAnnouncementPath))
-                    return false;
+                var window = new UpdateAnnouncementWindow(announcement)
+                {
+                    Owner = owner
+                };
 
-                string json = File.ReadAllText(PendingAnnouncementPath);
-                announcement = JsonSerializer.Deserialize<PostUpdateAnnouncement>(json, JsonOptions);
+                LogService.Info(
+                    $"Showing post-update announcement. " +
+                    $"Previous='{announcement.PreviousVersion}', Current='{announcement.CurrentVersion}'.");
+
+                window.ShowDialog();
 
                 TryDeletePendingAnnouncement();
 
-                return announcement is not null;
+                LogService.Info("Post-update announcement displayed and cleared.");
             }
             catch (Exception ex)
             {
-                LogService.Error(ex, "Failed to load the pending post-update announcement.");
+                LogService.Error(
+                    ex,
+                    "Failed while showing the pending post-update announcement. " +
+                    "The pending file was left in place so ClipVault can try again next launch.");
+            }
+        }
+
+        private static PostUpdateAnnouncement? TryReadAnnouncement()
+        {
+            try
+            {
+                if (!File.Exists(PendingAnnouncementPath))
+                    return null;
+
+                string json = File.ReadAllText(PendingAnnouncementPath);
+                var announcement = JsonSerializer.Deserialize<PostUpdateAnnouncement>(json, JsonOptions);
+
+                if (announcement is null)
+                {
+                    LogService.Warn("Pending post-update announcement file was present but could not be deserialized.");
+                    TryDeletePendingAnnouncement();
+                    return null;
+                }
+
+                LogService.Info($"Loaded pending post-update announcement from '{PendingAnnouncementPath}'.");
+                return announcement;
+            }
+            catch (Exception ex)
+            {
+                LogService.Error(ex, "Failed to read the pending post-update announcement.");
                 TryDeletePendingAnnouncement();
-                return false;
+                return null;
             }
         }
 
@@ -90,14 +143,15 @@ namespace ClipVault.Services
         {
             try
             {
-                if (File.Exists(PendingAnnouncementPath))
-                {
-                    File.Delete(PendingAnnouncementPath);
-                }
+                if (!File.Exists(PendingAnnouncementPath))
+                    return;
+
+                File.Delete(PendingAnnouncementPath);
+                LogService.Info($"Deleted pending post-update announcement at '{PendingAnnouncementPath}'.");
             }
-            catch
+            catch (Exception ex)
             {
-                // Never let cleanup break startup.
+                LogService.Error(ex, "Failed to delete the pending post-update announcement.");
             }
         }
     }

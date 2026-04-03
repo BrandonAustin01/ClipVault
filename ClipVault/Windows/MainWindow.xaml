@@ -11,7 +11,7 @@
         MinWidth="1100"
         MinHeight="700"
         WindowStartupLocation="CenterScreen"
-        Background="#0B1118"
+        Background="{DynamicResource AppBackgroundBrush}"       
         UseLayoutRounding="True"
         SnapsToDevicePixels="True"
         TextOptions.TextFormattingMode="Display"
@@ -19,7 +19,6 @@
         TextOptions.TextHintingMode="Fixed">
 
     <Window.Resources>
-        <!-- Core palette -->
         <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0B1118"/>
         <SolidColorBrush x:Key="SidebarBrush" Color="#0F1722"/>
         <SolidColorBrush x:Key="PanelBrush" Color="#101925"/>
@@ -42,7 +41,6 @@
         <SolidColorBrush x:Key="InputBorderBrush" Color="#263547"/>
         <SolidColorBrush x:Key="InputBorderHoverBrush" Color="#37506A"/>
 
-        <!-- Surface accents -->
         <SolidColorBrush x:Key="CardGlowBrush" Color="#1A2C43"/>
         <SolidColorBrush x:Key="SurfaceTopStrokeBrush" Color="#314A64"/>
         <SolidColorBrush x:Key="SurfaceBottomStrokeBrush" Color="#172331"/>
@@ -51,13 +49,34 @@
         <SolidColorBrush x:Key="PinnedCardBrush" Color="#142334"/>
         <SolidColorBrush x:Key="PinnedBorderBrush" Color="#4A86C7"/>
 
-        <!-- Sidebar header -->
+        <SolidColorBrush x:Key="SidebarHoverBrush" Color="#142131"/>
+        <SolidColorBrush x:Key="SidebarHoverBorderBrush" Color="#24384C"/>
+        <SolidColorBrush x:Key="SidebarPressedBrush" Color="#1A2D42"/>
+        <SolidColorBrush x:Key="SidebarPressedBorderBrush" Color="#36506D"/>
+
+        <SolidColorBrush x:Key="ActionButtonBackgroundBrush" Color="#162131"/>
+        <SolidColorBrush x:Key="ActionButtonBorderBrush" Color="#243548"/>
+        <SolidColorBrush x:Key="ActionButtonHoverBrush" Color="#1C2D43"/>
+        <SolidColorBrush x:Key="ActionButtonHoverBorderBrush" Color="#35506E"/>
+        <SolidColorBrush x:Key="ActionButtonPressedBrush" Color="#223854"/>
+        <SolidColorBrush x:Key="PrimaryButtonBorderBrush" Color="#315A87"/>
+        <SolidColorBrush x:Key="PrimaryButtonPressedBrush" Color="#25425F"/>
+        <SolidColorBrush x:Key="DangerHoverBorderBrush" Color="#BF5A69"/>
+        <SolidColorBrush x:Key="DangerPressedBrush" Color="#6C2630"/>
+
+        <SolidColorBrush x:Key="SidebarOuterBorderBrush" Color="#182433"/>
+        <SolidColorBrush x:Key="SidebarHeaderBorderBrush" Color="#263B52"/>
+        <SolidColorBrush x:Key="StorageBadgeBackgroundBrush" Color="#132338"/>
+        <SolidColorBrush x:Key="StorageBadgeBorderBrush" Color="#355B84"/>
+        <SolidColorBrush x:Key="StorageBadgeShadowBrush" Color="#0B1623"/>
+        <SolidColorBrush x:Key="ComboBoxPopupBrush" Color="#101925"/>
+        <SolidColorBrush x:Key="ComboBoxPopupBorderBrush" Color="#223040"/>
+
         <LinearGradientBrush x:Key="SidebarHeaderGlowBrush" StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="#1A2B40" Offset="0"/>
             <GradientStop Color="#0F1722" Offset="1"/>
         </LinearGradientBrush>
 
-        <!-- Scroll chrome -->
         <SolidColorBrush x:Key="ScrollTrackBrush" Color="#0F1823"/>
         <SolidColorBrush x:Key="ScrollThumbBrush" Color="#2A4159"/>
         <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#365674"/>
@@ -71,19 +90,19 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">
                         <Border x:Name="ThumbBorder"
-                        Background="{TemplateBinding Background}"
-                        CornerRadius="6"
-                        Margin="1"/>
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Margin="1"/>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="ThumbBorder"
-                                Property="Background"
-                                Value="{StaticResource ScrollThumbHoverBrush}"/>
+                                        Property="Background"
+                                        Value="{StaticResource ScrollThumbHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsDragging" Value="True">
                                 <Setter TargetName="ThumbBorder"
-                                Property="Background"
-                                Value="{StaticResource ScrollThumbPressedBrush}"/>
+                                        Property="Background"
+                                        Value="{StaticResource ScrollThumbPressedBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -113,14 +132,14 @@
                     <ControlTemplate TargetType="ScrollBar">
                         <Grid Background="Transparent">
                             <Border Background="{StaticResource ScrollTrackBrush}"
-                            CornerRadius="6"
-                            Margin="1"/>
+                                    CornerRadius="6"
+                                    Margin="1"/>
 
                             <Track x:Name="PART_Track"
-                           IsDirectionReversed="True">
+                                   IsDirectionReversed="True">
                                 <Track.DecreaseRepeatButton>
                                     <RepeatButton Style="{StaticResource ScrollRepeatButtonStyle}"
-                                          Command="ScrollBar.PageUpCommand"/>
+                                                  Command="ScrollBar.PageUpCommand"/>
                                 </Track.DecreaseRepeatButton>
 
                                 <Track.Thumb>
@@ -129,7 +148,7 @@
 
                                 <Track.IncreaseRepeatButton>
                                     <RepeatButton Style="{StaticResource ScrollRepeatButtonStyle}"
-                                          Command="ScrollBar.PageDownCommand"/>
+                                                  Command="ScrollBar.PageDownCommand"/>
                                 </Track.IncreaseRepeatButton>
                             </Track>
                         </Grid>
@@ -149,7 +168,6 @@
             </Setter>
         </Style>
 
-        <!-- Ambient glow -->
         <RadialGradientBrush x:Key="TopGlowBrush"
                              Center="0.18,0.0"
                              GradientOrigin="0.18,0.0"
@@ -168,7 +186,6 @@
             <GradientStop Color="#0011263F" Offset="1"/>
         </RadialGradientBrush>
 
-        <!-- Sidebar buttons -->
         <Style x:Key="SidebarButtonStyle" TargetType="Button">
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -196,17 +213,16 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#142131"/>
-                    <Setter Property="BorderBrush" Value="#24384C"/>
+                    <Setter Property="Background" Value="{StaticResource SidebarHoverBrush}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource SidebarHoverBorderBrush}"/>
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#1A2D42"/>
-                    <Setter Property="BorderBrush" Value="#36506D"/>
+                    <Setter Property="Background" Value="{StaticResource SidebarPressedBrush}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource SidebarPressedBorderBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <!-- Shared text input -->
         <Style x:Key="TextInputStyle" TargetType="TextBox">
             <Setter Property="Height" Value="42"/>
             <Setter Property="Padding" Value="14,10"/>
@@ -220,19 +236,182 @@
             <Setter Property="SelectionBrush" Value="{StaticResource AccentSoftBrush}"/>
         </Style>
 
-        <!-- Settings checkbox style -->
         <Style x:Key="SettingCheckBoxStyle" TargetType="CheckBox">
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid SnapsToDevicePixels="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="22"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border x:Name="Box"
+                                    Width="16"
+                                    Height="16"
+                                    CornerRadius="4"
+                                    Background="{StaticResource InputBackgroundBrush}"
+                                    BorderBrush="{StaticResource InputBorderBrush}"
+                                    BorderThickness="1"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"/>
+
+                            <Path x:Name="CheckMark"
+                                  Grid.Column="0"
+                                  Width="9"
+                                  Height="7"
+                                  Stroke="{StaticResource TextPrimaryBrush}"
+                                  StrokeThickness="2"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round"
+                                  Data="M 1 4 L 3.5 6.5 L 8 1.5"
+                                  Visibility="Collapsed"
+                                  VerticalAlignment="Center"
+                                  HorizontalAlignment="Center"/>
+
+                            <ContentPresenter Grid.Column="2"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True"/>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                <Setter TargetName="Box" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                            </Trigger>
+
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Box" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource AccentStrongBrush}"/>
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.55"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
-        <!-- Neutral action button -->
+        <Style x:Key="ThemeComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="ItemBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="10"
+                                Margin="6,4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource SidebarSelectedBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ThemeComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="MinWidth" Value="220"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="{StaticResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource InputBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="14,0,40,0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource ThemeComboBoxItemStyle}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="ComboBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="12"/>
+
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left"
+                                              RecognizesAccessKey="True"
+                                              IsHitTestVisible="False"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"/>
+
+                            <Path x:Name="Arrow"
+                                  Width="10"
+                                  Height="6"
+                                  HorizontalAlignment="Right"
+                                  Margin="0,0,14,0"
+                                  VerticalAlignment="Center"
+                                  Fill="{StaticResource TextMutedBrush}"
+                                  Data="M 0 0 L 5 6 L 10 0 Z"/>
+
+                            <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   PopupAnimation="Fade">
+                                <Border Margin="0,8,0,0"
+                                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                        Background="{StaticResource ComboBoxPopupBrush}"
+                                        BorderBrush="{StaticResource ComboBoxPopupBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="14">
+                                    <ScrollViewer Margin="6"
+                                                  SnapsToDevicePixels="True">
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{StaticResource InputBorderHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{StaticResource AccentStrongBrush}"/>
+                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource AccentStrongBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="ActionButtonStyle" TargetType="Button">
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-            <Setter Property="Background" Value="#162131"/>
-            <Setter Property="BorderBrush" Value="#243548"/>
+            <Setter Property="Background" Value="{StaticResource ActionButtonBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ActionButtonBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="MinWidth" Value="88"/>
+            <Setter Property="Padding" Value="14,0"/>
             <Setter Property="Margin" Value="0,0,8,0"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
@@ -251,11 +430,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#1C2D43"/>
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#35506E"/>
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ActionButtonHoverBrush}"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource ActionButtonHoverBorderBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#223854"/>
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ActionButtonPressedBrush}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Border" Property="Opacity" Value="0.55"/>
@@ -266,10 +445,9 @@
             </Setter>
         </Style>
 
-        <!-- Primary action button -->
         <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
             <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
-            <Setter Property="BorderBrush" Value="#315A87"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryButtonBorderBrush}"/>
             <Setter Property="Foreground" Value="White"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -277,12 +455,11 @@
                     <Setter Property="BorderBrush" Value="{StaticResource AccentStrongBrush}"/>
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#25425F"/>
+                    <Setter Property="Background" Value="{StaticResource PrimaryButtonPressedBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <!-- Danger action button -->
         <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
             <Setter Property="Background" Value="{StaticResource DangerBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource DangerBorderBrush}"/>
@@ -290,15 +467,71 @@
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{StaticResource DangerHoverBrush}"/>
-                    <Setter Property="BorderBrush" Value="#BF5A69"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource DangerHoverBorderBrush}"/>
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#6C2630"/>
+                    <Setter Property="Background" Value="{StaticResource DangerPressedBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <!-- Shared surface card -->
+        <Style x:Key="SettingsActionButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+
+        <Style x:Key="SettingsPrimaryButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+
+        <Style x:Key="SettingsDangerButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource DangerButtonStyle}">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+
+        <Style x:Key="HistoryItemButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="Width" Value="96"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="Padding" Value="12,0"/>
+        </Style>
+
+        <Style x:Key="HistoryItemPrimaryButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Setter Property="Width" Value="96"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="Padding" Value="12,0"/>
+        </Style>
+
+        <Style x:Key="HistoryItemDangerButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource DangerButtonStyle}">
+            <Setter Property="Width" Value="96"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="12,0"/>
+        </Style>
+
         <Style x:Key="SurfaceCardStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource CardBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}"/>
@@ -322,13 +555,11 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Settings cards stay crisp without the shared shadow -->
         <Style x:Key="SettingsCardStyle" TargetType="Border" BasedOn="{StaticResource SurfaceCardStyle}">
             <Setter Property="Effect" Value="{x:Null}"/>
             <Setter Property="SnapsToDevicePixels" Value="True"/>
         </Style>
 
-        <!-- Item card -->
         <Style x:Key="ItemCardStyle" TargetType="Border" BasedOn="{StaticResource SurfaceCardStyle}">
             <Setter Property="Margin" Value="0,0,0,14"/>
             <Setter Property="Padding" Value="18"/>
@@ -366,10 +597,9 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Sidebar -->
             <Border Grid.Column="0"
                     Background="{StaticResource SidebarBrush}"
-                    BorderBrush="#182433"
+                    BorderBrush="{StaticResource SidebarOuterBorderBrush}"
                     BorderThickness="0,0,1,0">
                 <Grid Margin="18">
                     <Grid.RowDefinitions>
@@ -381,7 +611,7 @@
 
                     <Border Grid.Row="0"
                             Background="{StaticResource SidebarHeaderGlowBrush}"
-                            BorderBrush="#263B52"
+                            BorderBrush="{StaticResource SidebarHeaderBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="20"
                             Padding="18">
@@ -425,26 +655,34 @@
                     </StackPanel>
 
                     <Border Grid.Row="3"
-                            Style="{StaticResource SurfaceCardStyle}"
-                            Background="#121C28"
-                            BorderBrush="#223040"
-                            Padding="14">
-                        <StackPanel>
-                            <TextBlock Text="Status"
-                                       Foreground="{StaticResource TextMutedBrush}"
-                                       FontSize="12"/>
-                            <TextBlock Text="{Binding StatusMessage}"
-                                       Margin="0,8,0,0"
+                            Background="Transparent"
+                            Padding="2,10,2,4">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Ellipse Width="8"
+                                     Height="8"
+                                     VerticalAlignment="Top"
+                                     Margin="0,4,0,0"
+                                     Fill="{StaticResource AccentBrush}"
+                                     Opacity="0.9"/>
+
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding StatusMessage}"
                                        TextWrapping="Wrap"
-                                       Foreground="{StaticResource TextPrimaryBrush}"
-                                       FontSize="13"
-                                       LineHeight="20"/>
-                        </StackPanel>
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       FontSize="12"
+                                       LineHeight="18"
+                                       Opacity="0.95"/>
+                        </Grid>
                     </Border>
                 </Grid>
             </Border>
 
-            <!-- Main content -->
             <Grid Grid.Column="1" Margin="22">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -453,7 +691,6 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Section header -->
                 <Grid Grid.Row="0" Margin="0,0,0,18">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -472,8 +709,8 @@
                     </StackPanel>
 
                     <Border Grid.Column="1"
-                            Background="#132338"
-                            BorderBrush="#355B84"
+                            Background="{StaticResource StorageBadgeBackgroundBrush}"
+                            BorderBrush="{StaticResource StorageBadgeBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="16"
                             Padding="14,9"
@@ -481,7 +718,7 @@
                         <Border.Effect>
                             <DropShadowEffect BlurRadius="14"
                                               ShadowDepth="0"
-                                              Color="#0B1623"
+                                              Color="{Binding Color, Source={StaticResource StorageBadgeShadowBrush}}"
                                               Opacity="0.28"/>
                         </Border.Effect>
                         <TextBlock Text="Local SQLite storage"
@@ -490,7 +727,6 @@
                     </Border>
                 </Grid>
 
-                <!-- Search and quick actions -->
                 <Border x:Name="SearchActionPanel"
                         Grid.Row="1"
                         Background="{StaticResource PanelBrush}"
@@ -525,7 +761,6 @@
                     </Grid>
                 </Border>
 
-                <!-- Stats -->
                 <UniformGrid x:Name="StatsPanel"
                              Grid.Row="2"
                              Columns="3"
@@ -571,7 +806,6 @@
                 </UniformGrid>
 
                 <Grid Grid.Row="3">
-                    <!-- Clipboard content -->
                     <Border x:Name="ClipboardContentPanel"
                             Background="{StaticResource PanelBrush}"
                             BorderBrush="{StaticResource CardBorderBrush}"
@@ -591,7 +825,7 @@
 
                             <ScrollViewer x:Name="ClipboardScroller"
                                           VerticalScrollBarVisibility="Auto">
-                                <ItemsControl ItemsSource="{Binding FilteredItems}">
+                                <ItemsControl ItemsSource="{Binding FilteredItems}" Margin="0,0,8,0">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border Style="{StaticResource ItemCardStyle}">
@@ -602,7 +836,6 @@
                                                         <RowDefinition Height="Auto"/>
                                                     </Grid.RowDefinitions>
 
-                                                    <!-- Title row -->
                                                     <Grid Grid.Row="0">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="*"/>
@@ -631,7 +864,6 @@
                                                         </StackPanel>
                                                     </Grid>
 
-                                                    <!-- Preview -->
                                                     <TextBlock Grid.Row="1"
                                                                Margin="0,16,0,16"
                                                                Text="{Binding DisplayText}"
@@ -640,7 +872,6 @@
                                                                FontSize="14"
                                                                LineHeight="24"/>
 
-                                                    <!-- Metadata and actions -->
                                                     <Grid Grid.Row="2">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="*"/>
@@ -660,26 +891,26 @@
                                                                        FontSize="12"/>
                                                         </StackPanel>
 
-                                                        <WrapPanel Grid.Column="1"
-                                                                   HorizontalAlignment="Right"
-                                                                   VerticalAlignment="Center"
-                                                                   ItemHeight="36"
-                                                                   Margin="12,0,0,0">
+                                                        <StackPanel Grid.Column="1"
+                                                                    Orientation="Horizontal"
+                                                                    HorizontalAlignment="Right"
+                                                                    VerticalAlignment="Center"
+                                                                    Margin="16,0,0,0">
                                                             <Button Content="Copy"
                                                                     Tag="{Binding Id}"
-                                                                    Style="{StaticResource PrimaryButtonStyle}"
+                                                                    Style="{StaticResource HistoryItemPrimaryButtonStyle}"
                                                                     Click="CopyItemButton_Click"/>
 
                                                             <Button Content="{Binding PinButtonLabel}"
                                                                     Tag="{Binding Id}"
-                                                                    Style="{StaticResource ActionButtonStyle}"
+                                                                    Style="{StaticResource HistoryItemButtonStyle}"
                                                                     Click="TogglePinButton_Click"/>
 
                                                             <Button Content="Edit"
                                                                     Tag="{Binding Id}"
                                                                     Click="EditSnippetButton_Click">
                                                                 <Button.Style>
-                                                                    <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                                                                    <Style TargetType="Button" BasedOn="{StaticResource HistoryItemButtonStyle}">
                                                                         <Setter Property="Visibility" Value="Collapsed"/>
                                                                         <Style.Triggers>
                                                                             <DataTrigger Binding="{Binding IsSnippet}" Value="True">
@@ -692,10 +923,9 @@
 
                                                             <Button Content="Delete"
                                                                     Tag="{Binding Id}"
-                                                                    Style="{StaticResource DangerButtonStyle}"
-                                                                    Margin="0"
+                                                                    Style="{StaticResource HistoryItemDangerButtonStyle}"
                                                                     Click="DeleteItemButton_Click"/>
-                                                        </WrapPanel>
+                                                        </StackPanel>
                                                     </Grid>
                                                 </Grid>
                                             </Border>
@@ -706,7 +936,6 @@
                         </Grid>
                     </Border>
 
-                    <!-- Settings dashboard -->
                     <Border x:Name="SettingsContentPanel"
                             Visibility="Collapsed"
                             Background="{StaticResource PanelBrush}"
@@ -714,232 +943,211 @@
                             BorderThickness="1"
                             CornerRadius="22"
                             Padding="20">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="18"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel>
+                                <Border Style="{StaticResource SettingsCardStyle}"
+                                        Padding="22">
+                                    <StackPanel>
+                                        <TextBlock Text="General"
+                                                   FontSize="20"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
 
-                                <!-- Top cards -->
-                                <Grid Grid.Row="0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="1.15*"/>
-                                        <ColumnDefinition Width="0.85*"/>
-                                    </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Core ClipVault behavior and local app preferences."
+                                                   Margin="0,6,0,0"
+                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                   TextWrapping="Wrap"/>
 
-                                    <!-- General -->
-                                    <Border Grid.Column="0"
-                                            Margin="0,0,10,0"
-                                            Style="{StaticResource SettingsCardStyle}"
-                                            Padding="22">
-                                        <StackPanel>
-                                            <TextBlock Text="General"
-                                                       FontSize="20"
-                                                       FontWeight="Bold"
-                                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <CheckBox x:Name="ChkLaunchOnStartup"
+                                                  Content="Launch ClipVault on startup"
+                                                  Margin="0,22,0,0"
+                                                  Style="{StaticResource SettingCheckBoxStyle}"/>
 
-                                            <TextBlock Text="Core ClipVault behavior and local app preferences."
-                                                       Margin="0,6,0,0"
+                                        <CheckBox x:Name="ChkClipboardMonitoring"
+                                                  Content="Watch clipboard changes automatically"
+                                                  Margin="0,10,0,0"
+                                                  Style="{StaticResource SettingCheckBoxStyle}"/>
+
+                                        <CheckBox x:Name="ChkMinimizeToTray"
+                                                  Content="Minimize to system tray"
+                                                  Margin="0,10,0,0"
+                                                  Style="{StaticResource SettingCheckBoxStyle}"/>
+
+                                        <CheckBox x:Name="ChkCloseToTray"
+                                                  Content="Close to system tray instead of exiting"
+                                                  Margin="0,10,0,0"
+                                                  Style="{StaticResource SettingCheckBoxStyle}"/>
+
+                                        <TextBlock Text="Theme"
+                                                   Margin="0,22,0,8"
+                                                   Foreground="{StaticResource TextMutedBrush}"/>
+
+                                        <ComboBox x:Name="ThemeComboBox"
+                                                  Width="220"
+                                                  HorizontalAlignment="Left"
+                                                  Style="{StaticResource ThemeComboBoxStyle}"
+                                                  SelectedValuePath="Tag"
+                                                  SelectionChanged="ThemeComboBox_SelectionChanged">
+                                            <ComboBoxItem Content="Midnight" Tag="Midnight"/>
+                                            <ComboBoxItem Content="Graphite" Tag="Graphite"/>
+                                            <ComboBoxItem Content="Aurora" Tag="Aurora"/>
+                                        </ComboBox>
+
+                                        <TextBlock Text="Max history items"
+                                                   Margin="0,22,0,8"
+                                                   Foreground="{StaticResource TextMutedBrush}"/>
+
+                                        <TextBox x:Name="MaxHistoryItemsTextBox"
+                                                 Width="220"
+                                                 HorizontalAlignment="Left"
+                                                 Style="{StaticResource TextInputStyle}"/>
+
+                                        <Grid Margin="0,22,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="Settings are stored locally in SQLite."
+                                                       VerticalAlignment="Center"
                                                        Foreground="{StaticResource TextMutedBrush}"
                                                        TextWrapping="Wrap"/>
 
-                                            <CheckBox x:Name="ChkLaunchOnStartup"
-                                                      Content="Launch ClipVault on startup"
-                                                      Margin="0,22,0,0"
-                                                      Style="{StaticResource SettingCheckBoxStyle}"/>
+                                            <Button Grid.Column="1"
+                                                    Content="Save Settings"
+                                                    Width="150"
+                                                    Margin="16,0,0,0"
+                                                    Style="{StaticResource PrimaryButtonStyle}"
+                                                    Click="SaveSettingsButton_Click"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
 
-                                            <CheckBox x:Name="ChkClipboardMonitoring"
-                                                      Content="Watch clipboard changes automatically"
-                                                      Margin="0,10,0,0"
-                                                      Style="{StaticResource SettingCheckBoxStyle}"/>
+                                <Border Margin="0,14,0,0"
+                                        Style="{StaticResource SettingsCardStyle}"
+                                        Padding="22">
+                                    <StackPanel>
+                                        <TextBlock Text="Data &amp; Backup"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
 
-                                            <CheckBox x:Name="ChkMinimizeToTray"
-                                                      Content="Minimize to system tray"
-                                                      Margin="0,10,0,0"
-                                                      Style="{StaticResource SettingCheckBoxStyle}"/>
+                                        <TextBlock Text="Protect your local clipboard history, snippets, and app settings."
+                                                   Margin="0,6,0,0"
+                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                   TextWrapping="Wrap"/>
 
-                                            <CheckBox x:Name="ChkCloseToTray"
-                                                      Content="Close to system tray instead of exiting"
-                                                      Margin="0,10,0,0"
-                                                      Style="{StaticResource SettingCheckBoxStyle}"/>
-
-                                            <TextBlock Text="Max history items"
-                                                       Margin="0,22,0,8"
-                                                       Foreground="{StaticResource TextMutedBrush}"/>
-
-                                            <TextBox x:Name="MaxHistoryItemsTextBox"
-                                                     Width="220"
-                                                     HorizontalAlignment="Left"
-                                                     Style="{StaticResource TextInputStyle}"/>
-
-                                            <Border Margin="0,22,0,0"
-                                                    Background="#0F1823"
-                                                    BorderBrush="{StaticResource CardBorderBrush}"
-                                                    BorderThickness="1"
-                                                    CornerRadius="14"
-                                                    Padding="14">
-                                                <StackPanel>
-                                                    <TextBlock Text="Updates"
-                                                               Foreground="{StaticResource TextMutedBrush}"
-                                                               FontSize="12"/>
-                                                    <TextBlock Text="ClipVault checks the official release feed built into this app."
-                                                               Margin="0,6,0,0"
-                                                               Foreground="{StaticResource TextPrimaryBrush}"
-                                                               TextWrapping="Wrap"/>
-                                                </StackPanel>
-                                            </Border>
-
-                                            <Grid Margin="0,22,0,0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-
-                                                <TextBlock Text="Settings are stored locally in SQLite."
-                                                           VerticalAlignment="Center"
-                                                           Foreground="{StaticResource TextMutedBrush}"
-                                                           TextWrapping="Wrap"/>
-
-                                                <Button Grid.Column="1"
-                                                        Content="Save Settings"
-                                                        Width="150"
-                                                        Margin="16,0,0,0"
-                                                        Style="{StaticResource PrimaryButtonStyle}"
-                                                        Click="SaveSettingsButton_Click"/>
-                                            </Grid>
-                                        </StackPanel>
-                                    </Border>
-
-                                    <!-- Tooling -->
-                                    <Grid Grid.Column="1" Margin="10,0,0,0">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="14"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-
-                                        <!-- Data and backup -->
-                                        <Border Grid.Row="0"
-                                                Style="{StaticResource SettingsCardStyle}"
-                                                Padding="22">
-                                            <StackPanel>
-                                                <TextBlock Text="Data &amp; Backup"
-                                                           FontSize="18"
-                                                           FontWeight="Bold"
-                                                           Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                                <TextBlock Text="Protect your local clipboard history, snippets, and app settings."
-                                                           Margin="0,6,0,0"
-                                                           Foreground="{StaticResource TextMutedBrush}"
-                                                           TextWrapping="Wrap"/>
-
-                                                <WrapPanel Margin="0,18,0,0">
-                                                    <Button Content="Export Backup"
-                                                            Width="145"
-                                                            Margin="0,0,10,10"
-                                                            Style="{StaticResource ActionButtonStyle}"
-                                                            Click="ExportBackupButton_Click"/>
-
-                                                    <Button Content="Import Backup"
-                                                            Width="145"
-                                                            Margin="0,0,0,10"
-                                                            Style="{StaticResource ActionButtonStyle}"
-                                                            Click="ImportBackupButton_Click"/>
-
-                                                    <Button Content="Open Data Folder"
-                                                            Width="145"
-                                                            Margin="0,0,10,0"
-                                                            Style="{StaticResource ActionButtonStyle}"
-                                                            Click="OpenDataFolderButton_Click"/>
-                                                </WrapPanel>
-                                            </StackPanel>
-                                        </Border>
-
-                                        <!-- Updates and maintenance -->
-                                        <Grid Grid.Row="2">
+                                        <Grid Margin="0,18,0,0">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="0.92*"/>
-                                                <ColumnDefinition Width="12"/>
-                                                <ColumnDefinition Width="1.08*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <!-- Updates -->
-                                            <Border Grid.Column="0"
-                                                    Style="{StaticResource SettingsCardStyle}"
-                                                    Padding="20">
-                                                <StackPanel>
-                                                    <TextBlock Text="Updates"
-                                                               FontSize="18"
-                                                               FontWeight="Bold"
-                                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <Button Grid.Column="0"
+                                                    Content="Export Backup"
+                                                    Style="{StaticResource SettingsActionButtonStyle}"
+                                                    Click="ExportBackupButton_Click"/>
 
-                                                    <TextBlock Text="Stay current and review what changed."
-                                                               Margin="0,6,0,0"
-                                                               Foreground="{StaticResource TextMutedBrush}"
-                                                               TextWrapping="Wrap"/>
+                                            <Button Grid.Column="2"
+                                                    Content="Import Backup"
+                                                    Style="{StaticResource SettingsActionButtonStyle}"
+                                                    Click="ImportBackupButton_Click"/>
 
-                                                    <Button Content="Check for Updates"
-                                                            Margin="0,18,0,0"
-                                                            HorizontalAlignment="Stretch"
-                                                            Style="{StaticResource PrimaryButtonStyle}"
-                                                            Click="CheckForUpdatesButton_Click"/>
-
-                                                    <Button Content="View Changelog"
-                                                            Margin="0,10,0,0"
-                                                            HorizontalAlignment="Stretch"
-                                                            Style="{StaticResource ActionButtonStyle}"
-                                                            Click="ViewCurrentChangelogButton_Click"/>
-                                                </StackPanel>
-                                            </Border>
-
-                                            <!-- Maintenance -->
-                                            <Border Grid.Column="2"
-                                                    Style="{StaticResource SettingsCardStyle}"
-                                                    Padding="20">
-                                                <StackPanel>
-                                                    <TextBlock Text="Maintenance"
-                                                               FontSize="18"
-                                                               FontWeight="Bold"
-                                                               Foreground="{StaticResource TextPrimaryBrush}"/>
-
-                                                    <TextBlock Text="Logs, cleanup tools, and local diagnostics."
-                                                               Margin="0,6,0,0"
-                                                               Foreground="{StaticResource TextMutedBrush}"
-                                                               TextWrapping="Wrap"/>
-
-                                                    <Button Content="View Current Log"
-                                                            Margin="0,18,0,0"
-                                                            HorizontalAlignment="Stretch"
-                                                            Style="{StaticResource ActionButtonStyle}"
-                                                            Click="OpenLogViewerButton_Click"/>
-
-                                                    <Button Content="Open Logs Folder"
-                                                            Margin="0,10,0,0"
-                                                            HorizontalAlignment="Stretch"
-                                                            Style="{StaticResource ActionButtonStyle}"
-                                                            Click="OpenLogsFolderButton_Click"/>
-
-                                                    <Button Margin="0,10,0,0"
-                                                            Padding="16,10"
-                                                            HorizontalAlignment="Stretch"
-                                                            Style="{StaticResource DangerButtonStyle}"
-                                                            Click="ClearHistoryButton_Click">
-                                                        <TextBlock Text="Clear Non-Pinned History"
-                                                                   TextWrapping="Wrap"
-                                                                   TextAlignment="Center"/>
-                                                    </Button>
-                                                </StackPanel>
-                                            </Border>
+                                            <Button Grid.Column="4"
+                                                    Content="Open Data Folder"
+                                                    Style="{StaticResource SettingsActionButtonStyle}"
+                                                    Click="OpenDataFolderButton_Click"/>
                                         </Grid>
-                                    </Grid>
-                                </Grid>
+                                    </StackPanel>
+                                </Border>
 
-                                <!-- Storage info -->
-                                <Border Grid.Row="2"
+                                <Border Margin="0,14,0,0"
                                         Style="{StaticResource SettingsCardStyle}"
-                                        Padding="20">
+                                        Padding="22">
+                                    <StackPanel>
+                                        <TextBlock Text="Updates"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                        <TextBlock Text="Stay current and review what changed."
+                                                   Margin="0,6,0,0"
+                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                   TextWrapping="Wrap"/>
+
+                                        <TextBlock Text="ClipVault checks the official release feed built into this app."
+                                                   Margin="0,14,0,0"
+                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                   TextWrapping="Wrap"/>
+
+                                        <Grid Margin="0,18,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Button Grid.Column="0"
+                                                    Content="Check for Updates"
+                                                    Style="{StaticResource SettingsPrimaryButtonStyle}"
+                                                    Click="CheckForUpdatesButton_Click"/>
+
+                                            <Button Grid.Column="2"
+                                                    Content="View Changelog"
+                                                    Style="{StaticResource SettingsActionButtonStyle}"
+                                                    Click="ViewCurrentChangelogButton_Click"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Margin="0,14,0,0"
+                                        Style="{StaticResource SettingsCardStyle}"
+                                        Padding="22">
+                                    <StackPanel>
+                                        <TextBlock Text="Maintenance"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                        <TextBlock Text="Logs, cleanup tools, and local diagnostics."
+                                                   Margin="0,6,0,0"
+                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                   TextWrapping="Wrap"/>
+
+                                        <Grid Margin="0,18,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Button Grid.Column="0"
+                                                    Content="View Current Log"
+                                                    Style="{StaticResource SettingsActionButtonStyle}"
+                                                    Click="OpenLogViewerButton_Click"/>
+
+                                            <Button Grid.Column="2"
+                                                    Content="Open Logs Folder"
+                                                    Style="{StaticResource SettingsActionButtonStyle}"
+                                                    Click="OpenLogsFolderButton_Click"/>
+
+                                            <Button Grid.Column="4"
+                                                    Content="Clear Non-Pinned History"
+                                                    Style="{StaticResource SettingsDangerButtonStyle}"
+                                                    Click="ClearHistoryButton_Click"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Margin="0,14,0,0"
+                                        Style="{StaticResource SettingsCardStyle}"
+                                        Padding="22">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -968,7 +1176,7 @@
                                         </StackPanel>
                                     </Grid>
                                 </Border>
-                            </Grid>
+                            </StackPanel>
                         </ScrollViewer>
                     </Border>
                 </Grid>

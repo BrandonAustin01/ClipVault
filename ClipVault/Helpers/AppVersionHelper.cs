@@ -25,7 +25,8 @@ public static class AppVersionHelper
             return $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{Math.Max(assemblyVersion.Build, 0)}";
         }
 
-        return "1.1.0";
+        // Avoid a stale hardcoded release number if metadata is missing.
+        return "0.0.0";
     }
 
     private static string CleanVersion(string? value)

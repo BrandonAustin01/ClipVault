@@ -8,8 +8,8 @@ namespace ClipVault.Helpers
     {
         private sealed class ChangelogEntry
         {
-            public Version Version { get; init; } = new(1, 0, 0);
-            public string VersionLabel { get; init; } = "1.0.0";
+            public Version Version { get; init; } = new(0, 0, 0);
+            public string VersionLabel { get; init; } = string.Empty;
             public string Notes { get; init; } = string.Empty;
         }
 
@@ -105,7 +105,14 @@ ClipVault 1.0.0 delivers the polished core experience and sets the foundation fo
 
             return string.Join(
                 Environment.NewLine + Environment.NewLine + "────────────────────────" + Environment.NewLine + Environment.NewLine,
-                ordered.Select(x => $"v{x.VersionLabel}{Environment.NewLine}{Environment.NewLine}{x.Notes.Trim()}"));
+                ordered.Select(x =>
+                {
+                    string label = string.IsNullOrWhiteSpace(x.VersionLabel)
+                        ? x.Version.ToString(3)
+                        : x.VersionLabel;
+
+                    return $"v{label}{Environment.NewLine}{Environment.NewLine}{x.Notes.Trim()}";
+                }));
         }
 
         private static Version? ParseVersion(string? value)

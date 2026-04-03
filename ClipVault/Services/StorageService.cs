@@ -55,7 +55,7 @@ public sealed class StorageService
         EnsureDefaultSetting("LaunchOnStartup", "0");
         EnsureDefaultSetting("MinimizeToTray", "0");
         EnsureDefaultSetting("CloseToTray", "0");
-        EnsureDefaultSetting("Theme", "Dark");
+        EnsureDefaultSetting("Theme", "Midnight");
         EnsureDefaultSetting("UpdateFeedUrl", string.Empty);
     }
 
@@ -157,7 +157,7 @@ public sealed class StorageService
         SaveSettingInternal(connection, transaction, "MaxHistoryItems", settings.MaxHistoryItems.ToString(CultureInfo.InvariantCulture));
         SaveSettingInternal(connection, transaction, "MinimizeToTray", settings.MinimizeToTray ? "1" : "0");
         SaveSettingInternal(connection, transaction, "CloseToTray", settings.CloseToTray ? "1" : "0");
-        SaveSettingInternal(connection, transaction, "Theme", settings.Theme ?? "Dark");
+        SaveSettingInternal(connection, transaction, "Theme", NormalizeThemeValue(settings.Theme));
         SaveSettingInternal(connection, transaction, "UpdateFeedUrl", settings.UpdateFeedUrl ?? string.Empty);
 
         transaction.Commit();
@@ -303,7 +303,7 @@ public sealed class StorageService
             MaxHistoryItems = GetIntSetting("MaxHistoryItems", DefaultMaxHistoryItems),
             MinimizeToTray = GetBoolSetting("MinimizeToTray", false),
             CloseToTray = GetBoolSetting("CloseToTray", false),
-            Theme = GetSetting("Theme") ?? "Dark",
+            Theme = NormalizeThemeValue(GetSetting("Theme")),
             UpdateFeedUrl = GetSetting("UpdateFeedUrl") ?? string.Empty
         };
 
@@ -317,7 +317,7 @@ public sealed class StorageService
         SaveSetting("MaxHistoryItems", settings.MaxHistoryItems.ToString(CultureInfo.InvariantCulture));
         SaveSetting("MinimizeToTray", settings.MinimizeToTray ? "1" : "0");
         SaveSetting("CloseToTray", settings.CloseToTray ? "1" : "0");
-        SaveSetting("Theme", settings.Theme);
+        SaveSetting("Theme", NormalizeThemeValue(settings.Theme));
         SaveSetting("UpdateFeedUrl", settings.UpdateFeedUrl ?? string.Empty);
     }
 
@@ -380,6 +380,21 @@ public sealed class StorageService
             return parsed;
 
         return defaultValue;
+    }
+
+    private static string NormalizeThemeValue(string? theme)
+    {
+        if (string.IsNullOrWhiteSpace(theme))
+            return "Midnight";
+
+        return theme.Trim() switch
+        {
+            "Dark" => "Midnight",
+            "Midnight" => "Midnight",
+            "Graphite" => "Graphite",
+            "Aurora" => "Aurora",
+            _ => "Midnight"
+        };
     }
 
     private void EnsureDefaultSetting(string key, string defaultValue)

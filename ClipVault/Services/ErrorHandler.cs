@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Windows;
-using WpfMessageBox = System.Windows.MessageBox;
 
 namespace ClipVault.Services;
 
@@ -25,7 +24,7 @@ public static class ErrorHandler
                 $"Details: {exception.Message}{Environment.NewLine}{Environment.NewLine}" +
                 $"Log file:{Environment.NewLine}{LogService.CurrentLogFilePath}";
 
-            WpfMessageBox.Show(
+            DialogService.Show(
                 message,
                 title,
                 MessageBoxButton.OK,
