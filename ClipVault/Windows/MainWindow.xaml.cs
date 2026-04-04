@@ -1,4 +1,8 @@
-﻿using System;
+﻿using ClipVault.Helpers;
+using ClipVault.Models;
+using ClipVault.Services;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -8,23 +12,20 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using ClipVault.Models;
-using ClipVault.Services;
-using ClipVault.Helpers;
-using Microsoft.Win32;
-using System.Collections.Generic;
-using WpfColorConverter = System.Windows.Media.ColorConverter;
-using WpfColor = System.Windows.Media.Color;
+using WpfApplication = System.Windows.Application;
 using WpfBrush = System.Windows.Media.Brush;
 using WpfBrushes = System.Windows.Media.Brushes;
 using WpfButton = System.Windows.Controls.Button;
+using WpfColor = System.Windows.Media.Color;
+using WpfColorConverter = System.Windows.Media.ColorConverter;
+using WpfComboBox = System.Windows.Controls.ComboBox;
 using WpfOpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using WpfSaveFileDialog = Microsoft.Win32.SaveFileDialog;
-using WpfComboBox = System.Windows.Controls.ComboBox;
+using WpfWindow = System.Windows.Window;
 
 namespace ClipVault;
 
-public partial class MainWindow : Window, INotifyPropertyChanged
+public partial class MainWindow : WpfWindow, INotifyPropertyChanged
 {
     private const string DefaultUpdateFeedUrl = "https://brandonmckinney.dev/clipvault/updates";
 
@@ -158,6 +159,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ApplyWindowBranding();
         DataContext = this;
 
+        Loaded += MainWindow_Loaded;
+
         _clipboardMonitorService.ClipboardTextCaptured += ClipboardMonitorService_ClipboardTextCaptured;
         _trayIconService.OpenRequested += TrayIconService_OpenRequested;
         _trayIconService.ExitRequested += TrayIconService_ExitRequested;
@@ -167,7 +170,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             InitializePersistence();
             LoadPersistedItems();
             ApplySettingsToUi();
-            ApplyTheme(_appSettings.Theme);
             SetSection("History");
             UpdateStats();
 
@@ -177,6 +179,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             LogService.Info("Main window initialized successfully.");
         }, "Main window initialization");
+    }
+
+    private void MainWindow_Loaded(object? sender, RoutedEventArgs e)
+    {
+        Loaded -= MainWindow_Loaded;
+
+        RunGuarded(() =>
+        {
+            ApplyTheme(_appSettings.Theme);
+        }, "Initial theme apply");
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -592,6 +604,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ApplyFilter()
     {
+        if (!AreFilterVisualsReady())
+            return;
+
         var items = CurrentSectionTitle switch
         {
             "History" => AllItems.Where(x => !x.IsSnippet),
@@ -608,9 +623,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             string lowered = query.ToLowerInvariant();
 
             items = items.Where(x =>
-                x.Title.ToLowerInvariant().Contains(lowered) ||
-                x.Category.ToLowerInvariant().Contains(lowered) ||
-                x.FullText.ToLowerInvariant().Contains(lowered));
+                (x.Title ?? string.Empty).ToLowerInvariant().Contains(lowered) ||
+                (x.Category ?? string.Empty).ToLowerInvariant().Contains(lowered) ||
+                (x.FullText ?? string.Empty).ToLowerInvariant().Contains(lowered));
         }
 
         var orderedItems = items
@@ -632,6 +647,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void UpdateEmptyState()
     {
+        if (NoItemsText is null || ClipboardScroller is null)
+            return;
+
         bool hasItems = FilteredItems.Count > 0;
 
         NoItemsText.Visibility = hasItems ? Visibility.Collapsed : Visibility.Visible;
@@ -695,8 +713,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }, "Section change");
     }
 
+    private bool AreFilterVisualsReady()
+    {
+        return SearchTextBox is not null &&
+               NoItemsText is not null &&
+               ClipboardScroller is not null;
+    }
+
     private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
+        if (!AreFilterVisualsReady())
+            return;
+
         try
         {
             ApplyFilter();
@@ -1382,6 +1410,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     ["StorageBadgeBackgroundBrush"] = "#1C2A3A",
                     ["StorageBadgeBorderBrush"] = "#546B83",
                     ["StorageBadgeShadowBrush"] = "#0B1118",
+                    ["StatusIndicatorBrush"] = "#B8C7D8",
+                    ["SurfaceShadowBrush"] = "#090C10",
                     ["ComboBoxPopupBrush"] = "#141920",
                     ["ComboBoxPopupBorderBrush"] = "#2C3947"
                 },
@@ -1442,6 +1472,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     ["StorageBadgeBackgroundBrush"] = "#11303A",
                     ["StorageBadgeBorderBrush"] = "#3A8090",
                     ["StorageBadgeShadowBrush"] = "#071216",
+                    ["StatusIndicatorBrush"] = "#4FD7C4",
+                    ["SurfaceShadowBrush"] = "#061015",
                     ["ComboBoxPopupBrush"] = "#0E1B20",
                     ["ComboBoxPopupBorderBrush"] = "#21444E"
                 },
@@ -1502,6 +1534,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     ["StorageBadgeBackgroundBrush"] = "#132338",
                     ["StorageBadgeBorderBrush"] = "#355B84",
                     ["StorageBadgeShadowBrush"] = "#0B1623",
+                    ["StatusIndicatorBrush"] = "#4EA1FF",
+                    ["SurfaceShadowBrush"] = "#0A1320",
                     ["ComboBoxPopupBrush"] = "#101925",
                     ["ComboBoxPopupBorderBrush"] = "#223040"
                 },
@@ -1514,20 +1548,68 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         };
     }
 
+
     private void SetBrushColor(string resourceKey, string hexColor)
     {
-        if (FindResource(resourceKey) is SolidColorBrush brush)
+        var replacementBrush = new SolidColorBrush(ParseColor(hexColor));
+
+        Resources[resourceKey] = replacementBrush;
+
+        if (WpfApplication.Current is not null)
         {
-            brush.Color = ParseColor(hexColor);
+            WpfApplication.Current.Resources[resourceKey] = replacementBrush;
         }
     }
 
     private void SetGradientStops(string resourceKey, string firstColor, string secondColor)
     {
-        if (FindResource(resourceKey) is GradientBrush gradientBrush && gradientBrush.GradientStops.Count >= 2)
+        if (TryFindResource(resourceKey) is not GradientBrush existingBrush || existingBrush.GradientStops.Count < 2)
+            return;
+
+        GradientBrush replacementBrush = existingBrush switch
         {
-            gradientBrush.GradientStops[0].Color = ParseColor(firstColor);
-            gradientBrush.GradientStops[1].Color = ParseColor(secondColor);
+            LinearGradientBrush linear => new LinearGradientBrush
+            {
+                StartPoint = linear.StartPoint,
+                EndPoint = linear.EndPoint,
+                MappingMode = linear.MappingMode,
+                SpreadMethod = linear.SpreadMethod,
+                ColorInterpolationMode = linear.ColorInterpolationMode,
+                Opacity = linear.Opacity,
+                Transform = linear.Transform,
+                RelativeTransform = linear.RelativeTransform
+            },
+            RadialGradientBrush radial => new RadialGradientBrush
+            {
+                Center = radial.Center,
+                GradientOrigin = radial.GradientOrigin,
+                RadiusX = radial.RadiusX,
+                RadiusY = radial.RadiusY,
+                MappingMode = radial.MappingMode,
+                SpreadMethod = radial.SpreadMethod,
+                ColorInterpolationMode = radial.ColorInterpolationMode,
+                Opacity = radial.Opacity,
+                Transform = radial.Transform,
+                RelativeTransform = radial.RelativeTransform
+            },
+            _ => existingBrush.CloneCurrentValue()
+        };
+
+        replacementBrush.GradientStops.Clear();
+        replacementBrush.GradientStops.Add(new GradientStop(ParseColor(firstColor), existingBrush.GradientStops[0].Offset));
+        replacementBrush.GradientStops.Add(new GradientStop(ParseColor(secondColor), existingBrush.GradientStops[1].Offset));
+
+        for (int i = 2; i < existingBrush.GradientStops.Count; i++)
+        {
+            var stop = existingBrush.GradientStops[i];
+            replacementBrush.GradientStops.Add(new GradientStop(stop.Color, stop.Offset));
+        }
+
+        Resources[resourceKey] = replacementBrush;
+
+        if (WpfApplication.Current is not null)
+        {
+            WpfApplication.Current.Resources[resourceKey] = replacementBrush;
         }
     }
 

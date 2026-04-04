@@ -87,6 +87,12 @@ public partial class App : WpfApplication
             {
                 try
                 {
+                    if (!mainWindow.IsLoaded || mainWindow.Visibility != Visibility.Visible)
+                    {
+                        LogService.Warn("Skipped startup post-update announcement check because the main window was not ready.");
+                        return;
+                    }
+
                     LogService.Info("Running startup check for a pending post-update announcement.");
                     PostUpdateExperienceService.ShowPendingAnnouncement(mainWindow);
                 }
@@ -94,7 +100,7 @@ public partial class App : WpfApplication
                 {
                     LogService.Error(ex, "Failed to show the post-update announcement.");
                 }
-            }), DispatcherPriority.Background);
+            }), DispatcherPriority.ApplicationIdle);
 
             LogService.Info("ClipVault startup completed.");
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Windows;
 
@@ -24,11 +24,19 @@ public static class ErrorHandler
                 $"Details: {exception.Message}{Environment.NewLine}{Environment.NewLine}" +
                 $"Log file:{Environment.NewLine}{LogService.CurrentLogFilePath}";
 
-            DialogService.Show(
-                message,
-                title,
-                MessageBoxButton.OK,
-                isFatal ? MessageBoxImage.Error : MessageBoxImage.Warning);
+            try
+            {
+                DialogService.Show(
+                    message,
+                    title,
+                    MessageBoxButton.OK,
+                    isFatal ? MessageBoxImage.Error : MessageBoxImage.Warning);
+            }
+            catch (Exception dialogEx)
+            {
+                LogService.Error(dialogEx, "ClipVaultDialogWindow failed while trying to show an error dialog.");
+                throw;
+            }
         }
         finally
         {

@@ -1,27 +1,17 @@
-﻿using ClipVault.Services;
+using ClipVault.Services;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace ClipVault
 {
-    /// <summary>
-    /// Interaction logic for UpdateAnnouncementWindow.xaml
-    /// </summary>
     public partial class UpdateAnnouncementWindow : Window
     {
         private bool _isChangelogVisible;
 
         public UpdateAnnouncementWindow(PostUpdateAnnouncement announcement)
         {
+            ArgumentNullException.ThrowIfNull(announcement);
+
             InitializeComponent();
 
             string currentVersion = string.IsNullOrWhiteSpace(announcement.CurrentVersion)
@@ -44,6 +34,14 @@ namespace ClipVault
             ChangelogTextBox.Text = string.IsNullOrWhiteSpace(announcement.ChangelogText)
                 ? "No changelog text was saved for this update."
                 : announcement.ChangelogText;
+
+            Loaded += (_, _) =>
+            {
+                if (ToggleChangelogButton is not null)
+                {
+                    ToggleChangelogButton.Focus();
+                }
+            };
         }
 
         private void ToggleChangelogButton_Click(object sender, RoutedEventArgs e)
@@ -54,7 +52,7 @@ namespace ClipVault
                 ? Visibility.Visible
                 : Visibility.Collapsed;
 
-            Height = _isChangelogVisible ? 640 : 300;
+            Height = _isChangelogVisible ? 640 : 320;
 
             ToggleChangelogButton.Content = _isChangelogVisible
                 ? "Hide Changelog"

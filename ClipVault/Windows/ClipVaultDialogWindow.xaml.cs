@@ -1,7 +1,13 @@
-﻿using System;
+using System.Linq;
+using System;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using WpfBrush = System.Windows.Media.Brush;
 using WpfButton = System.Windows.Controls.Button;
+using WpfColor = System.Windows.Media.Color;
+using WpfColorConverter = System.Windows.Media.ColorConverter;
+
 
 namespace ClipVault;
 
@@ -16,20 +22,35 @@ public partial class ClipVaultDialogWindow : Window
         MessageBoxImage icon)
     {
         InitializeComponent();
+        ValidateNamedControls();
 
         Title = string.IsNullOrWhiteSpace(title) ? "ClipVault" : title;
         TitleTextBlock.Text = Title;
-        MessageTextBlock.Text = message;
+        MessageTextBlock.Text = message ?? string.Empty;
 
         ApplyIcon(icon);
         BuildButtons(buttons);
+
+        Loaded += (_, _) => FocusPrimaryButton();
+    }
+
+    private void ValidateNamedControls()
+    {
+        if (TitleTextBlock is null ||
+            MessageTextBlock is null ||
+            IconBadge is null ||
+            IconGlyphTextBlock is null ||
+            ButtonsPanel is null)
+        {
+            throw new InvalidOperationException("ClipVaultDialogWindow failed to initialize its visual tree.");
+        }
     }
 
     private void ApplyIcon(MessageBoxImage icon)
     {
-        var infoBrush = (WpfBrush)FindResource("InfoBrush");
-        var warningBrush = (WpfBrush)FindResource("WarningBrush");
-        var errorBrush = (WpfBrush)FindResource("ErrorBrush");
+        var infoBrush = GetBrushOrFallback("InfoBrush", "#355B84");
+        var warningBrush = GetBrushOrFallback("WarningBrush", "#B88B2E");
+        var errorBrush = GetBrushOrFallback("ErrorBrush", "#A24755");
 
         switch (icon)
         {
@@ -92,9 +113,11 @@ public partial class ClipVaultDialogWindow : Window
         var button = new WpfButton
         {
             Content = text,
-            Style = (Style)FindResource(primary ? "PrimaryButtonStyle" : "ActionButtonStyle"),
+            Style = GetButtonStyle(primary),
             IsDefault = text == "OK" || text == "Yes",
-            IsCancel = text == "Cancel"
+            IsCancel = text == "Cancel",
+            MinWidth = 108,
+            Margin = new Thickness(0, 0, 8, 0)
         };
 
         button.Click += (_, _) =>
@@ -105,6 +128,33 @@ public partial class ClipVaultDialogWindow : Window
         };
 
         return button;
+    }
+
+    private Style GetButtonStyle(bool primary)
+    {
+        string key = primary ? "PrimaryButtonStyle" : "ActionButtonStyle";
+
+        if (TryFindResource(key) is Style style)
+        {
+            return style;
+        }
+
+        throw new InvalidOperationException($"Required dialog button style '{key}' was not found.");
+    }
+
+    private WpfBrush GetBrushOrFallback(string resourceKey, string fallbackHex)
+    {
+        return TryFindResource(resourceKey) as WpfBrush
+               ?? new SolidColorBrush((WpfColor)WpfColorConverter.ConvertFromString(fallbackHex)!);
+    }
+
+    private void FocusPrimaryButton()
+    {
+        var primaryButton = ButtonsPanel.Children
+            .OfType<WpfButton>()
+            .FirstOrDefault(x => x.IsDefault);
+
+        primaryButton?.Focus();
     }
 
     protected override void OnClosed(EventArgs e)
