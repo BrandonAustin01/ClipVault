@@ -8,51 +8,30 @@
         MinHeight="320"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="#0B1118">
+        Background="{DynamicResource AppBackgroundBrush}">
 
     <Window.Resources>
-        <!-- Core palette -->
-        <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0B1118"/>
-        <SolidColorBrush x:Key="PanelBrush" Color="#101925"/>
-        <SolidColorBrush x:Key="CardBrush" Color="#121C28"/>
-        <SolidColorBrush x:Key="CardHoverBrush" Color="#152233"/>
-        <SolidColorBrush x:Key="CardBorderBrush" Color="#223040"/>
-        <SolidColorBrush x:Key="CardBorderHoverBrush" Color="#33506F"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="#4EA1FF"/>
-        <SolidColorBrush x:Key="AccentStrongBrush" Color="#6AB2FF"/>
-        <SolidColorBrush x:Key="AccentSoftBrush" Color="#162437"/>
-        <SolidColorBrush x:Key="AccentSoftHoverBrush" Color="#1B3047"/>
-        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F3F7FB"/>
-        <SolidColorBrush x:Key="TextMutedBrush" Color="#95A7BC"/>
-        <SolidColorBrush x:Key="TextSoftBrush" Color="#B9C6D5"/>
-
-        <!-- Scroll chrome -->
-        <SolidColorBrush x:Key="ScrollTrackBrush" Color="#0F1823"/>
-        <SolidColorBrush x:Key="ScrollThumbBrush" Color="#2A4159"/>
-        <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#365674"/>
-        <SolidColorBrush x:Key="ScrollThumbPressedBrush" Color="#46719A"/>
-
         <Style x:Key="ScrollThumbStyle" TargetType="Thumb">
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="Focusable" Value="False"/>
-            <Setter Property="Background" Value="{StaticResource ScrollThumbBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ScrollThumbBrush}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">
                         <Border x:Name="ThumbBorder"
-                        Background="{TemplateBinding Background}"
-                        CornerRadius="6"
-                        Margin="1"/>
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Margin="1"/>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="ThumbBorder"
-                                Property="Background"
-                                Value="{StaticResource ScrollThumbHoverBrush}"/>
+                                        Property="Background"
+                                        Value="{DynamicResource ScrollThumbHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsDragging" Value="True">
                                 <Setter TargetName="ThumbBorder"
-                                Property="Background"
-                                Value="{StaticResource ScrollThumbPressedBrush}"/>
+                                        Property="Background"
+                                        Value="{DynamicResource ScrollThumbPressedBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -81,15 +60,15 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="ScrollBar">
                         <Grid Background="Transparent">
-                            <Border Background="{StaticResource ScrollTrackBrush}"
-                            CornerRadius="6"
-                            Margin="1"/>
+                            <Border Background="{DynamicResource ScrollTrackBrush}"
+                                    CornerRadius="6"
+                                    Margin="1"/>
 
                             <Track x:Name="PART_Track"
-                           IsDirectionReversed="True">
+                                   IsDirectionReversed="True">
                                 <Track.DecreaseRepeatButton>
                                     <RepeatButton Style="{StaticResource ScrollRepeatButtonStyle}"
-                                          Command="ScrollBar.PageUpCommand"/>
+                                                  Command="ScrollBar.PageUpCommand"/>
                                 </Track.DecreaseRepeatButton>
 
                                 <Track.Thumb>
@@ -98,7 +77,7 @@
 
                                 <Track.IncreaseRepeatButton>
                                     <RepeatButton Style="{StaticResource ScrollRepeatButtonStyle}"
-                                          Command="ScrollBar.PageDownCommand"/>
+                                                  Command="ScrollBar.PageDownCommand"/>
                                 </Track.IncreaseRepeatButton>
                             </Track>
                         </Grid>
@@ -118,29 +97,9 @@
             </Setter>
         </Style>
 
-        <!-- Ambient glow -->
-        <RadialGradientBrush x:Key="TopGlowBrush"
-                             Center="0.18,0.02"
-                             GradientOrigin="0.18,0.02"
-                             RadiusX="0.66"
-                             RadiusY="0.66">
-            <GradientStop Color="#16365B" Offset="0"/>
-            <GradientStop Color="#0016365B" Offset="1"/>
-        </RadialGradientBrush>
-
-        <RadialGradientBrush x:Key="BottomGlowBrush"
-                             Center="0.88,1.00"
-                             GradientOrigin="0.88,1.00"
-                             RadiusX="0.74"
-                             RadiusY="0.74">
-            <GradientStop Color="#11263F" Offset="0"/>
-            <GradientStop Color="#0011263F" Offset="1"/>
-        </RadialGradientBrush>
-
-        <!-- Shared surfaces -->
         <Style x:Key="SurfaceCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource CardBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="20"/>
             <Setter Property="Padding" Value="18"/>
@@ -155,17 +114,16 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource CardHoverBrush}"/>
-                    <Setter Property="BorderBrush" Value="{StaticResource CardBorderHoverBrush}"/>
+                    <Setter Property="Background" Value="{DynamicResource CardHoverBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource CardBorderHoverBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <!-- Shared buttons -->
         <Style x:Key="ActionButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-            <Setter Property="Background" Value="#162131"/>
-            <Setter Property="BorderBrush" Value="#243548"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ActionButtonBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ActionButtonBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="14,9"/>
             <Setter Property="Margin" Value="0,0,8,0"/>
@@ -186,11 +144,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#1C2D43"/>
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#35506E"/>
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ActionButtonHoverBrush}"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource ActionButtonHoverBorderBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#223854"/>
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ActionButtonPressedBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -199,25 +157,25 @@
         </Style>
 
         <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-            <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
-            <Setter Property="BorderBrush" Value="#315A87"/>
+            <Setter Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBorderBrush}"/>
             <Setter Property="Foreground" Value="White"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentSoftHoverBrush}"/>
-                    <Setter Property="BorderBrush" Value="{StaticResource AccentStrongBrush}"/>
+                    <Setter Property="Background" Value="{DynamicResource AccentSoftHoverBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentStrongBrush}"/>
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#25425F"/>
+                    <Setter Property="Background" Value="{DynamicResource PrimaryButtonPressedBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
 
-    <Grid Background="{StaticResource AppBackgroundBrush}">
+    <Grid Background="{DynamicResource AppBackgroundBrush}">
         <Ellipse Width="760"
                  Height="760"
-                 Fill="{StaticResource TopGlowBrush}"
+                 Fill="{DynamicResource TopGlowBrush}"
                  HorizontalAlignment="Left"
                  VerticalAlignment="Top"
                  Margin="-180,-250,0,0"
@@ -225,7 +183,7 @@
 
         <Ellipse Width="860"
                  Height="860"
-                 Fill="{StaticResource BottomGlowBrush}"
+                 Fill="{DynamicResource BottomGlowBrush}"
                  HorizontalAlignment="Right"
                  VerticalAlignment="Bottom"
                  Margin="0,0,-220,-310"
@@ -242,7 +200,6 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Header -->
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -253,38 +210,36 @@
                     <TextBlock Text="ClipVault was updated"
                                FontSize="29"
                                FontWeight="Bold"
-                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
                     <TextBlock x:Name="VersionTextBlock"
                                Margin="0,7,0,0"
                                FontSize="13"
-                               Foreground="{StaticResource TextMutedBrush}"/>
+                               Foreground="{DynamicResource TextMutedBrush}"/>
                 </StackPanel>
 
                 <Border Grid.Column="1"
-                        Background="#132338"
-                        BorderBrush="#355B84"
+                        Background="{DynamicResource StorageBadgeBackgroundBrush}"
+                        BorderBrush="{DynamicResource StorageBadgeBorderBrush}"
                         BorderThickness="1"
                         CornerRadius="14"
                         Padding="12,8"
                         VerticalAlignment="Center">
                     <TextBlock Text="Update installed"
-                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
                                FontWeight="SemiBold"/>
                 </Border>
             </Grid>
 
-            <!-- Summary -->
             <Border Grid.Row="2"
                     Style="{StaticResource SurfaceCardStyle}"
-                    Background="{StaticResource PanelBrush}">
+                    Background="{DynamicResource PanelBrush}">
                 <TextBlock x:Name="SummaryTextBlock"
                            TextWrapping="Wrap"
-                           Foreground="{StaticResource TextPrimaryBrush}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
                            FontSize="14"
                            LineHeight="22"/>
             </Border>
 
-            <!-- Changelog -->
             <Border x:Name="ChangelogBorder"
                     Grid.Row="4"
                     Style="{StaticResource SurfaceCardStyle}"
@@ -299,14 +254,14 @@
                     <TextBlock Text="Changelog"
                                FontSize="16"
                                FontWeight="Bold"
-                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
 
                     <TextBox x:Name="ChangelogTextBox"
                              Grid.Row="2"
                              Padding="0"
                              Background="Transparent"
                              BorderThickness="0"
-                             Foreground="{StaticResource TextSoftBrush}"
+                             Foreground="{DynamicResource TextSoftBrush}"
                              FontSize="13"
                              IsReadOnly="True"
                              TextWrapping="Wrap"
@@ -316,7 +271,6 @@
                 </Grid>
             </Border>
 
-            <!-- Footer buttons -->
             <StackPanel Grid.Row="6"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">

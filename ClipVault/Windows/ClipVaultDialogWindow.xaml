@@ -8,39 +8,17 @@
         ShowInTaskbar="False"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        Background="#0B1118"
+        Background="{DynamicResource AppBackgroundBrush}"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0B1118"/>
-        <SolidColorBrush x:Key="PanelBrush" Color="#101925"/>
-        <SolidColorBrush x:Key="CardBrush" Color="#121C28"/>
-        <SolidColorBrush x:Key="CardBorderBrush" Color="#223040"/>
-        <SolidColorBrush x:Key="AccentSoftBrush" Color="#162437"/>
-        <SolidColorBrush x:Key="AccentSoftHoverBrush" Color="#1B3047"/>
-        <SolidColorBrush x:Key="AccentStrongBrush" Color="#6AB2FF"/>
-        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F3F7FB"/>
-        <SolidColorBrush x:Key="TextMutedBrush" Color="#95A7BC"/>
-        <SolidColorBrush x:Key="WarningBrush" Color="#B88B2E"/>
-        <SolidColorBrush x:Key="ErrorBrush" Color="#A24755"/>
-        <SolidColorBrush x:Key="InfoBrush" Color="#355B84"/>
-
-        <RadialGradientBrush x:Key="TopGlowBrush"
-                             Center="0.18,0.02"
-                             GradientOrigin="0.18,0.02"
-                             RadiusX="0.66"
-                             RadiusY="0.66">
-            <GradientStop Color="#16365B" Offset="0"/>
-            <GradientStop Color="#0016365B" Offset="1"/>
-        </RadialGradientBrush>
-
         <Style x:Key="ActionButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-            <Setter Property="Background" Value="#162131"/>
-            <Setter Property="BorderBrush" Value="#243548"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ActionButtonBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ActionButtonBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="14,9"/>
             <Setter Property="Margin" Value="0,0,8,0"/>
@@ -62,11 +40,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#1C2D43"/>
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#35506E"/>
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ActionButtonHoverBrush}"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource ActionButtonHoverBorderBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#223854"/>
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ActionButtonPressedBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -75,36 +53,39 @@
         </Style>
 
         <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-            <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
-            <Setter Property="BorderBrush" Value="#315A87"/>
+            <Setter Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBorderBrush}"/>
             <Setter Property="Foreground" Value="White"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentSoftHoverBrush}"/>
-                    <Setter Property="BorderBrush" Value="{StaticResource AccentStrongBrush}"/>
+                    <Setter Property="Background" Value="{DynamicResource AccentSoftHoverBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentStrongBrush}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource PrimaryButtonPressedBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
 
-    <Grid Background="{StaticResource AppBackgroundBrush}">
+    <Grid Background="{DynamicResource AppBackgroundBrush}">
         <Canvas ClipToBounds="False"
-            IsHitTestVisible="False">
+                IsHitTestVisible="False">
             <Ellipse Width="720"
-                 Height="720"
-                 Fill="{StaticResource TopGlowBrush}"
-                 Canvas.Left="-180"
-                 Canvas.Top="-260"/>
+                     Height="720"
+                     Fill="{DynamicResource TopGlowBrush}"
+                     Canvas.Left="-180"
+                     Canvas.Top="-260"/>
         </Canvas>
 
         <Border Margin="16"
-            Background="{StaticResource PanelBrush}"
-            BorderBrush="{StaticResource CardBorderBrush}"
-            BorderThickness="1"
-            CornerRadius="22"
-            Padding="18"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Top">
+                Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="22"
+                Padding="18"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -122,46 +103,46 @@
                     </Grid.ColumnDefinitions>
 
                     <Border x:Name="IconBadge"
-                        Width="42"
-                        Height="42"
-                        CornerRadius="21"
-                        Background="{StaticResource InfoBrush}"
-                        VerticalAlignment="Top">
+                            Width="42"
+                            Height="42"
+                            CornerRadius="21"
+                            Background="{DynamicResource AccentBrush}"
+                            VerticalAlignment="Top">
                         <TextBlock x:Name="IconGlyphTextBlock"
-                               Text="i"
-                               FontSize="18"
-                               FontWeight="Bold"
-                               Foreground="White"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"/>
+                                   Text="i"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
                     </Border>
 
                     <TextBlock x:Name="TitleTextBlock"
-                           Grid.Column="2"
-                           FontSize="21"
-                           FontWeight="Bold"
-                           Foreground="{StaticResource TextPrimaryBrush}"
-                           VerticalAlignment="Center"/>
+                               Grid.Column="2"
+                               FontSize="21"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               VerticalAlignment="Center"/>
                 </Grid>
 
                 <Border Grid.Row="2"
-                    Background="{StaticResource CardBrush}"
-                    BorderBrush="{StaticResource CardBorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="16"
-                    Padding="16">
+                        Background="{DynamicResource CardBrush}"
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="16"
+                        Padding="16">
                     <TextBlock x:Name="MessageTextBlock"
-                           MaxWidth="560"
-                           TextWrapping="Wrap"
-                           FontSize="14"
-                           LineHeight="22"
-                           Foreground="{StaticResource TextPrimaryBrush}"/>
+                               MaxWidth="560"
+                               TextWrapping="Wrap"
+                               FontSize="14"
+                               LineHeight="22"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
                 </Border>
 
                 <StackPanel Grid.Row="4"
-                        x:Name="ButtonsPanel"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right"/>
+                            x:Name="ButtonsPanel"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"/>
             </Grid>
         </Border>
     </Grid>

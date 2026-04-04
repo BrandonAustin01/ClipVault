@@ -3,5 +3,98 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              ShutdownMode="OnMainWindowClose">
     <Application.Resources>
+        <ResourceDictionary>
+            <!-- Base global theme brushes: Midnight defaults -->
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0B1118"/>
+            <SolidColorBrush x:Key="SidebarBrush" Color="#0F1722"/>
+            <SolidColorBrush x:Key="PanelBrush" Color="#101925"/>
+
+            <SolidColorBrush x:Key="CardBrush" Color="#121C28"/>
+            <SolidColorBrush x:Key="CardHoverBrush" Color="#152233"/>
+            <SolidColorBrush x:Key="CardBorderBrush" Color="#223040"/>
+            <SolidColorBrush x:Key="CardBorderHoverBrush" Color="#33506F"/>
+
+            <SolidColorBrush x:Key="AccentBrush" Color="#4EA1FF"/>
+            <SolidColorBrush x:Key="AccentStrongBrush" Color="#6AB2FF"/>
+            <SolidColorBrush x:Key="AccentSoftBrush" Color="#162437"/>
+            <SolidColorBrush x:Key="AccentSoftHoverBrush" Color="#1B3047"/>
+
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F3F7FB"/>
+            <SolidColorBrush x:Key="TextMutedBrush" Color="#95A7BC"/>
+            <SolidColorBrush x:Key="TextSoftBrush" Color="#B9C6D5"/>
+
+            <SolidColorBrush x:Key="SidebarSelectedBrush" Color="#162437"/>
+            <SolidColorBrush x:Key="SidebarHoverBrush" Color="#142131"/>
+            <SolidColorBrush x:Key="SidebarHoverBorderBrush" Color="#24384C"/>
+            <SolidColorBrush x:Key="SidebarPressedBrush" Color="#1A2D42"/>
+            <SolidColorBrush x:Key="SidebarPressedBorderBrush" Color="#36506D"/>
+            <SolidColorBrush x:Key="SidebarOuterBorderBrush" Color="#182433"/>
+            <SolidColorBrush x:Key="SidebarHeaderBorderBrush" Color="#263B52"/>
+
+            <SolidColorBrush x:Key="InputBackgroundBrush" Color="#0E1620"/>
+            <SolidColorBrush x:Key="InputBorderBrush" Color="#263547"/>
+            <SolidColorBrush x:Key="InputBorderHoverBrush" Color="#37506A"/>
+
+            <SolidColorBrush x:Key="PillBackgroundBrush" Color="#162334"/>
+            <SolidColorBrush x:Key="PillBorderBrush" Color="#29435D"/>
+
+            <SolidColorBrush x:Key="PinnedCardBrush" Color="#142334"/>
+            <SolidColorBrush x:Key="PinnedBorderBrush" Color="#4A86C7"/>
+
+            <SolidColorBrush x:Key="ActionButtonBackgroundBrush" Color="#162131"/>
+            <SolidColorBrush x:Key="ActionButtonBorderBrush" Color="#243548"/>
+            <SolidColorBrush x:Key="ActionButtonHoverBrush" Color="#1C2D43"/>
+            <SolidColorBrush x:Key="ActionButtonHoverBorderBrush" Color="#35506E"/>
+            <SolidColorBrush x:Key="ActionButtonPressedBrush" Color="#223854"/>
+
+            <SolidColorBrush x:Key="PrimaryButtonBorderBrush" Color="#315A87"/>
+            <SolidColorBrush x:Key="PrimaryButtonPressedBrush" Color="#25425F"/>
+
+            <SolidColorBrush x:Key="DangerBrush" Color="#6F2630"/>
+            <SolidColorBrush x:Key="DangerHoverBrush" Color="#87303A"/>
+            <SolidColorBrush x:Key="DangerBorderBrush" Color="#A24755"/>
+            <SolidColorBrush x:Key="DangerHoverBorderBrush" Color="#BF5A69"/>
+            <SolidColorBrush x:Key="DangerPressedBrush" Color="#6C2630"/>
+
+            <SolidColorBrush x:Key="StorageBadgeBackgroundBrush" Color="#132338"/>
+            <SolidColorBrush x:Key="StorageBadgeBorderBrush" Color="#355B84"/>
+            <SolidColorBrush x:Key="StorageBadgeShadowBrush" Color="#0B1623"/>
+
+            <SolidColorBrush x:Key="StatusIndicatorBrush" Color="#4EA1FF"/>
+            <SolidColorBrush x:Key="SurfaceShadowBrush" Color="#0A1320"/>
+
+            <SolidColorBrush x:Key="ComboBoxPopupBrush" Color="#101925"/>
+            <SolidColorBrush x:Key="ComboBoxPopupBorderBrush" Color="#223040"/>
+
+            <SolidColorBrush x:Key="ScrollTrackBrush" Color="#0F1823"/>
+            <SolidColorBrush x:Key="ScrollThumbBrush" Color="#2A4159"/>
+            <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#365674"/>
+            <SolidColorBrush x:Key="ScrollThumbPressedBrush" Color="#46719A"/>
+
+            <LinearGradientBrush x:Key="SidebarHeaderGlowBrush"
+                         StartPoint="0,0"
+                         EndPoint="1,1">
+                <GradientStop Color="#1A2B40" Offset="0"/>
+                <GradientStop Color="#0F1722" Offset="1"/>
+            </LinearGradientBrush>
+
+            <RadialGradientBrush x:Key="TopGlowBrush"
+                         Center="0.28,0.18"
+                         GradientOrigin="0.28,0.18"
+                         RadiusX="0.72"
+                         RadiusY="0.72">
+                <GradientStop Color="#16365B" Offset="0"/>
+                <GradientStop Color="#0016365B" Offset="1"/>
+            </RadialGradientBrush>
+
+            <RadialGradientBrush x:Key="BottomGlowBrush"
+                         Center="0.82,0.88"
+                         GradientOrigin="0.82,0.88"
+                         RadiusX="0.82"
+                         RadiusY="0.82">
+                <GradientStop Color="#11263F" Offset="0"/>
+                <GradientStop Color="#0011263F" Offset="1"/>
+            </RadialGradientBrush>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
