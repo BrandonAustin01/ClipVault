@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace ClipVault.Helpers
@@ -13,74 +14,17 @@ namespace ClipVault.Helpers
             public string Notes { get; init; } = string.Empty;
         }
 
-        // Add a new entry here every release.
-        private static readonly IReadOnlyList<ChangelogEntry> Entries = new List<ChangelogEntry>
-        {
-            new()
-            {
-                Version = new Version(1, 1, 0),
-                VersionLabel = "1.1.0",
-                Notes =
-"""
-Highlights
-- Backup export and import
-- Redesigned Settings page
-- Post-update message
-- Built-in changelog viewer
-- UI polish across the app
-- Styled dialogs and improved window consistency
-
-Included in this release
-- Added backup export for local ClipVault data
-- Added backup import with replace confirmation flow
-- Added post-update popup after installing a new version
-- Added built-in changelog viewer
-- Redesigned the Settings page for a cleaner layout
-- Polished the main window UI
-- Matched popup window styling across the app
-- Added custom in-app dialogs for a more consistent look
-- Improved scrollbar styling
-- Improved overall visual consistency and usability
-
-Summary
-ClipVault 1.1.0 builds on the first full release with backup support, a cleaner settings experience, a better update flow, and a more polished UI throughout the app.
-"""
-            },
-
-            new()
-            {
-                Version = new Version(1, 0, 0),
-                VersionLabel = "1.0.0",
-                Notes =
-"""
-Highlights
-- Clipboard history
-- Pinned items
-- Reusable snippets
-- Built-in log viewer
-- Tray support
-- Startup option
-- Packaged updater support
-
-Included in this release
-- Main window UI polish
-- Snippet editor polish
-- Log viewer
-- Dark ComboBox fix in the log viewer
-- Stability and UX improvements
-
-Summary
-ClipVault 1.0.0 delivers the polished core experience and sets the foundation for future updates.
-"""
-            }
-        };
+        private const string ChangelogFileName = "CHANGELOG.txt";
+        private const string SectionSeparator = "────────────────────────";
 
         public static string BuildChangesSince(string? previousVersion, string? currentVersion)
         {
             Version? previous = ParseVersion(previousVersion);
             Version? current = ParseVersion(currentVersion);
 
-            IEnumerable<ChangelogEntry> matchingEntries = Entries;
+            var entries = LoadEntries();
+
+            IEnumerable<ChangelogEntry> matchingEntries = entries;
 
             if (current is not null)
             {
@@ -104,15 +48,76 @@ ClipVault 1.0.0 delivers the polished core experience and sets the foundation fo
             }
 
             return string.Join(
-                Environment.NewLine + Environment.NewLine + "────────────────────────" + Environment.NewLine + Environment.NewLine,
-                ordered.Select(x =>
-                {
-                    string label = string.IsNullOrWhiteSpace(x.VersionLabel)
-                        ? x.Version.ToString(3)
-                        : x.VersionLabel;
+                Environment.NewLine + Environment.NewLine + SectionSeparator + Environment.NewLine + Environment.NewLine,
+                ordered.Select(x => $"v{x.VersionLabel}{Environment.NewLine}{Environment.NewLine}{x.Notes.Trim()}"));
+        }
 
-                    return $"v{label}{Environment.NewLine}{Environment.NewLine}{x.Notes.Trim()}";
-                }));
+        private static IReadOnlyList<ChangelogEntry> LoadEntries()
+        {
+            try
+            {
+                string changelogPath = Path.Combine(AppContext.BaseDirectory, ChangelogFileName);
+
+                if (!File.Exists(changelogPath))
+                {
+                    return Array.Empty<ChangelogEntry>();
+                }
+
+                string raw = File.ReadAllText(changelogPath);
+
+                if (string.IsNullOrWhiteSpace(raw))
+                {
+                    return Array.Empty<ChangelogEntry>();
+                }
+
+                var sections = raw
+                    .Split(
+                        new[] { SectionSeparator },
+                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .ToList();
+
+                var entries = new List<ChangelogEntry>();
+
+                foreach (string section in sections)
+                {
+                    var lines = section
+                        .Replace("\r\n", "\n")
+                        .Split('\n')
+                        .Select(x => x.TrimEnd())
+                        .ToList();
+
+                    string? versionLine = lines.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+                    if (string.IsNullOrWhiteSpace(versionLine))
+                    {
+                        continue;
+                    }
+
+                    string versionLabel = versionLine.Trim().TrimStart('v', 'V');
+
+                    if (!Version.TryParse(versionLabel, out Version? parsedVersion))
+                    {
+                        continue;
+                    }
+
+                    int firstContentIndex = lines.FindIndex(x => !string.IsNullOrWhiteSpace(x));
+                    string notes = firstContentIndex >= 0 && firstContentIndex + 1 < lines.Count
+                        ? string.Join(Environment.NewLine, lines.Skip(firstContentIndex + 1)).Trim()
+                        : string.Empty;
+
+                    entries.Add(new ChangelogEntry
+                    {
+                        Version = parsedVersion,
+                        VersionLabel = versionLabel,
+                        Notes = notes
+                    });
+                }
+
+                return entries;
+            }
+            catch
+            {
+                return Array.Empty<ChangelogEntry>();
+            }
         }
 
         private static Version? ParseVersion(string? value)
