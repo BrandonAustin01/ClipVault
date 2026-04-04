@@ -26,6 +26,7 @@ public sealed class BackupAppSettings
     public bool CloseToTray { get; set; }
     public string Theme { get; set; } = "Dark";
     public string UpdateFeedUrl { get; set; } = string.Empty;
+    public bool CheckForUpdatesOnStartup { get; set; } = true;
 }
 
 public sealed class BackupClipboardEntry
@@ -75,6 +76,7 @@ public sealed class BackupService
             ExportedAtUtc = DateTime.UtcNow,
             Settings = new BackupAppSettings
             {
+                CheckForUpdatesOnStartup = settings.CheckForUpdatesOnStartup,
                 LaunchOnStartup = settings.LaunchOnStartup,
                 ClipboardMonitoringEnabled = settings.ClipboardMonitoringEnabled,
                 MaxHistoryItems = settings.MaxHistoryItems,
@@ -120,6 +122,7 @@ public sealed class BackupService
 
         return new AppSettings
         {
+            CheckForUpdatesOnStartup = document.Settings.CheckForUpdatesOnStartup,
             LaunchOnStartup = document.Settings.LaunchOnStartup,
             ClipboardMonitoringEnabled = document.Settings.ClipboardMonitoringEnabled,
             MaxHistoryItems = document.Settings.MaxHistoryItems < 1 ? 100 : document.Settings.MaxHistoryItems,

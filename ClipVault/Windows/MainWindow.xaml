@@ -1090,6 +1090,11 @@
                                                    Foreground="{DynamicResource TextMutedBrush}"
                                                    TextWrapping="Wrap"/>
 
+                                        <CheckBox x:Name="ChkCheckForUpdatesOnStartup"
+                                                  Content="Check for updates automatically at startup"
+                                                  Margin="0,18,0,0"
+                                                  Style="{StaticResource SettingCheckBoxStyle}"/>
+
                                         <WrapPanel Margin="0,18,0,0">
                                             <Button Content="Check for Updates"
                                                     Style="{StaticResource SettingsPrimaryButtonStyle}"

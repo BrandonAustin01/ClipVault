@@ -42,6 +42,7 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
     private bool _sourceInitialized;
     private bool _allowRealClose;
     private bool _isUpdateCheckRunning;
+    private bool _hasTriggeredStartupUpdateCheck;
 
     private string _currentSectionTitle = "History";
     private string _currentSectionSubtitle = "Your recent copied items will live here.";
@@ -189,6 +190,13 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
         {
             ApplyTheme(_appSettings.Theme);
         }, "Initial theme apply");
+
+        if (_appSettings.CheckForUpdatesOnStartup)
+        {
+            Dispatcher.BeginInvoke(
+                new Action(async () => await TryRunStartupUpdateCheckAsync()),
+                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        }
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -300,11 +308,12 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
         ChkClipboardMonitoring.IsChecked = _appSettings.ClipboardMonitoringEnabled;
         ChkMinimizeToTray.IsChecked = _appSettings.MinimizeToTray;
         ChkCloseToTray.IsChecked = _appSettings.CloseToTray;
+        ChkCheckForUpdatesOnStartup.IsChecked = _appSettings.CheckForUpdatesOnStartup;
         MaxHistoryItemsTextBox.Text = _appSettings.MaxHistoryItems.ToString();
 
         if (ThemeComboBox is not null)
         {
-            ThemeComboBox.SelectedValue = NormalizeThemeName(_appSettings.Theme);
+            SelectThemeComboBoxItem(NormalizeThemeName(_appSettings.Theme));
         }
     }
 
@@ -929,8 +938,14 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
             _appSettings.ClipboardMonitoringEnabled = ChkClipboardMonitoring.IsChecked == true;
             _appSettings.MinimizeToTray = ChkMinimizeToTray.IsChecked == true;
             _appSettings.CloseToTray = ChkCloseToTray.IsChecked == true;
+            _appSettings.CheckForUpdatesOnStartup = ChkCheckForUpdatesOnStartup.IsChecked == true;
             _appSettings.MaxHistoryItems = maxHistoryItems;
-            _appSettings.Theme = NormalizeThemeName(ThemeComboBox.SelectedValue as string ?? ThemeComboBox.Text);
+            string selectedTheme =
+                (ThemeComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString()
+                ?? ThemeComboBox.Text
+                ?? string.Empty;
+
+            _appSettings.Theme = NormalizeThemeName(selectedTheme);
 
             ApplyTheme(_appSettings.Theme);
 
@@ -953,120 +968,7 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
 
     private async void CheckForUpdatesButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_isUpdateCheckRunning)
-        {
-            StatusMessage = "An update check is already running.";
-            return;
-        }
-
-        string updateFeedUrl = DefaultUpdateFeedUrl;
-
-        try
-        {
-            _isUpdateCheckRunning = true;
-            StatusMessage = "Checking for updates...";
-            LogService.Info($"Checking for updates from {updateFeedUrl}");
-
-            var progress = new Progress<int>(percent =>
-            {
-                StatusMessage = $"Downloading update... {percent}%";
-            });
-
-            var result = await _updateService.CheckForUpdatesAsync(updateFeedUrl, progress);
-
-            switch (result.State)
-            {
-                case UpdateCheckState.NoFeedConfigured:
-                    StatusMessage = "The update feed is not configured in this build.";
-                    DialogService.Show(
-                        "The update feed is not configured in this build.",
-                        "ClipVault",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-                    break;
-
-                case UpdateCheckState.NotInstalled:
-                    StatusMessage = "Updates only work from an installed ClipVault build.";
-                    DialogService.Show(
-                        "ClipVault is not running from a Velopack-installed build yet." + Environment.NewLine + Environment.NewLine +
-                        "This is expected if you launched it from Visual Studio, bin\\Release, or a loose publish folder. " +
-                        "Install the packaged Setup.exe build first, then update checks will work.",
-                        "ClipVault",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-                    break;
-
-                case UpdateCheckState.UpToDate:
-                    StatusMessage = string.IsNullOrWhiteSpace(result.CurrentVersion)
-                        ? "ClipVault is already up to date."
-                        : $"ClipVault is already up to date ({result.CurrentVersion}).";
-                    DialogService.Show(
-                        StatusMessage,
-                        "ClipVault",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-                    break;
-
-                case UpdateCheckState.UpdatePendingRestart:
-                case UpdateCheckState.UpdateReadyToApply:
-                    StatusMessage = $"Update {result.TargetVersion} is ready to install.";
-
-                    var promptResult = DialogService.Show(
-                        $"Update {result.TargetVersion} is ready.{Environment.NewLine}{Environment.NewLine}" +
-                        $"Current version: {result.CurrentVersion ?? DisplayVersion}{Environment.NewLine}" +
-                        $"New version: {result.TargetVersion}{Environment.NewLine}{Environment.NewLine}" +
-                        "Install it now and restart ClipVault?",
-                        "ClipVault Update Ready",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question);
-
-                    if (promptResult == MessageBoxResult.Yes)
-                    {
-                        LogService.Info($"Applying update {result.TargetVersion}.");
-
-                        try
-                        {
-                            string previousVersion = result.CurrentVersion ?? DisplayVersion;
-                            string currentVersion = string.IsNullOrWhiteSpace(result.TargetVersion)
-                                ? DisplayVersion
-                                : result.TargetVersion;
-
-                            string changelogText = ChangelogCatalog.BuildChangesSince(previousVersion, currentVersion);
-
-                            PostUpdateExperienceService.QueueAnnouncement(
-                                previousVersion,
-                                currentVersion,
-                                changelogText);
-                        }
-                        catch (Exception ex)
-                        {
-                            LogService.Error(ex, "Failed to queue the post-update announcement.");
-                            // Do not block the update if the announcement fails to save.
-                        }
-
-                        result.ApplyAndRestart?.Invoke();
-                        return;
-                    }
-
-                    StatusMessage = $"Update {result.TargetVersion} downloaded. Restart ClipVault when you are ready to install it.";
-                    break;
-            }
-        }
-        catch (Exception ex)
-        {
-            LogService.Error(ex, "Update check failed.");
-            StatusMessage = "Update check failed. Check the log.";
-
-            DialogService.Show(
-                $"ClipVault could not finish checking for updates.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                "ClipVault Update Error",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-        }
-        finally
-        {
-            _isUpdateCheckRunning = false;
-        }
+        await CheckForUpdatesAsync(isAutomatic: false);
     }
 
     private void ClearHistoryButton_Click(object sender, RoutedEventArgs e)
@@ -1310,7 +1212,15 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
         if (!IsLoaded)
             return;
 
-        if (sender is not WpfComboBox comboBox || comboBox.SelectedValue is not string selectedTheme)
+        if (sender is not WpfComboBox comboBox)
+            return;
+
+        string selectedTheme =
+            (comboBox.SelectedItem as ComboBoxItem)?.Content?.ToString()
+            ?? comboBox.Text
+            ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(selectedTheme))
             return;
 
         string normalizedTheme = NormalizeThemeName(selectedTheme);
@@ -1658,5 +1568,215 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
 
             StatusMessage = "Opened credits.";
         }, "Open credits");
+    }
+
+    private async Task TryRunStartupUpdateCheckAsync()
+    {
+        if (_hasTriggeredStartupUpdateCheck || !_appSettings.CheckForUpdatesOnStartup)
+            return;
+
+        _hasTriggeredStartupUpdateCheck = true;
+
+        if (PostUpdateExperienceService.HasPendingAnnouncement())
+        {
+            LogService.Info("Skipped automatic startup update check because a post-update announcement is pending.");
+            return;
+        }
+
+        await CheckForUpdatesAsync(isAutomatic: true);
+    }
+
+    private string GetEffectiveUpdateFeedUrl()
+    {
+        return string.IsNullOrWhiteSpace(_appSettings.UpdateFeedUrl)
+            ? DefaultUpdateFeedUrl
+            : _appSettings.UpdateFeedUrl.Trim();
+    }
+
+    private async Task CheckForUpdatesAsync(bool isAutomatic)
+    {
+        if (_isUpdateCheckRunning)
+        {
+            if (!isAutomatic)
+            {
+                StatusMessage = "An update check is already running.";
+            }
+
+            return;
+        }
+
+        string updateFeedUrl = GetEffectiveUpdateFeedUrl();
+
+        try
+        {
+            _isUpdateCheckRunning = true;
+
+            if (!isAutomatic)
+            {
+                StatusMessage = "Checking for updates...";
+            }
+
+            LogService.Info($"{(isAutomatic ? "Automatic" : "Manual")} update check started from {updateFeedUrl}");
+
+            IProgress<int>? progress = null;
+
+            if (!isAutomatic)
+            {
+                progress = new Progress<int>(percent =>
+                {
+                    StatusMessage = $"Downloading update... {percent}%";
+                });
+            }
+
+            var result = await _updateService.CheckForUpdatesAsync(updateFeedUrl, progress);
+
+            switch (result.State)
+            {
+                case UpdateCheckState.NoFeedConfigured:
+                    if (!isAutomatic)
+                    {
+                        StatusMessage = "The update feed is not configured in this build.";
+                        DialogService.Show(
+                            "The update feed is not configured in this build.",
+                            "ClipVault",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        LogService.Warn("Automatic update check skipped because no update feed URL is configured.");
+                    }
+                    break;
+
+                case UpdateCheckState.NotInstalled:
+                    if (!isAutomatic)
+                    {
+                        StatusMessage = "Updates only work from an installed ClipVault build.";
+                        DialogService.Show(
+                            "ClipVault is not running from a Velopack-installed build yet." + Environment.NewLine + Environment.NewLine +
+                            "This is expected if you launched it from Visual Studio, bin\\Release, or a loose publish folder. " +
+                            "Install the packaged Setup.exe build first, then update checks will work.",
+                            "ClipVault",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        LogService.Info("Automatic update check skipped because ClipVault is not running from an installed build.");
+                    }
+                    break;
+
+                case UpdateCheckState.UpToDate:
+                    if (!isAutomatic)
+                    {
+                        StatusMessage = string.IsNullOrWhiteSpace(result.CurrentVersion)
+                            ? "ClipVault is already up to date."
+                            : $"ClipVault is already up to date ({result.CurrentVersion}).";
+
+                        DialogService.Show(
+                            StatusMessage,
+                            "ClipVault",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        LogService.Info(
+                            string.IsNullOrWhiteSpace(result.CurrentVersion)
+                                ? "Automatic update check found no updates."
+                                : $"Automatic update check found no updates. Current version: {result.CurrentVersion}.");
+                    }
+                    break;
+
+                case UpdateCheckState.UpdatePendingRestart:
+                case UpdateCheckState.UpdateReadyToApply:
+                    StatusMessage = $"Update {result.TargetVersion} is ready to install.";
+
+                    var promptResult = DialogService.Show(
+                        $"Update {result.TargetVersion} is ready.{Environment.NewLine}{Environment.NewLine}" +
+                        $"Current version: {result.CurrentVersion ?? DisplayVersion}{Environment.NewLine}" +
+                        $"New version: {result.TargetVersion}{Environment.NewLine}{Environment.NewLine}" +
+                        "Install it now and restart ClipVault?",
+                        "ClipVault Update Ready",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (promptResult == MessageBoxResult.Yes)
+                    {
+                        LogService.Info($"Applying update {result.TargetVersion}.");
+
+                        try
+                        {
+                            string previousVersion = result.CurrentVersion ?? DisplayVersion;
+                            string currentVersion = string.IsNullOrWhiteSpace(result.TargetVersion)
+                                ? DisplayVersion
+                                : result.TargetVersion;
+
+                            string changelogText = ChangelogCatalog.BuildChangesSince(previousVersion, currentVersion);
+
+                            PostUpdateExperienceService.QueueAnnouncement(
+                                previousVersion,
+                                currentVersion,
+                                changelogText);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogService.Error(ex, "Failed to queue the post-update announcement.");
+                        }
+
+                        result.ApplyAndRestart?.Invoke();
+                        return;
+                    }
+
+                    StatusMessage = $"Update {result.TargetVersion} downloaded. Restart ClipVault when you are ready to install it.";
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            LogService.Error(ex, "Update check failed.");
+
+            if (!isAutomatic)
+            {
+                StatusMessage = "Update check failed. Check the log.";
+
+                DialogService.Show(
+                    $"ClipVault could not finish checking for updates.{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                    "ClipVault Update Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            else
+            {
+                LogService.Warn("Automatic startup update check failed silently.");
+            }
+        }
+        finally
+        {
+            _isUpdateCheckRunning = false;
+        }
+    }
+
+    private void SelectThemeComboBoxItem(string themeName)
+    {
+        if (ThemeComboBox is null)
+            return;
+
+        string normalizedTheme = NormalizeThemeName(themeName);
+
+        foreach (var item in ThemeComboBox.Items)
+        {
+            if (item is ComboBoxItem comboBoxItem)
+            {
+                string itemTheme = NormalizeThemeName(comboBoxItem.Content?.ToString());
+                if (string.Equals(itemTheme, normalizedTheme, StringComparison.Ordinal))
+                {
+                    ThemeComboBox.SelectedItem = comboBoxItem;
+                    return;
+                }
+            }
+        }
+
+        ThemeComboBox.Text = normalizedTheme;
     }
 }

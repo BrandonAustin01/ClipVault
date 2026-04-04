@@ -8,7 +8,7 @@
         MinHeight="560"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResize"
-        Background="#0B1118">
+        Background="{DynamicResource AppBackgroundBrush}">
 
     <Window.Resources>
         <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0B1118"/>
