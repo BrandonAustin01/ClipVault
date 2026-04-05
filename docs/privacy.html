@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClipVault Privacy</title>
+    <meta
+      name="description"
+      content="Privacy and storage details for ClipVault."
+    />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="brand" href="index.html" aria-label="ClipVault home">
+          <img src="assets/logo.png" alt="ClipVault logo" class="brand-logo" />
+          <span class="brand-name">ClipVault</span>
+        </a>
+
+        <div class="nav-actions">
+          <a class="nav-link" href="index.html">Home</a>
+          <a class="nav-link" href="docs.html">Docs</a>
+          <a class="nav-link active-link" href="privacy.html">Privacy</a>
+          <a class="nav-link" href="changelog.html">Changelog</a>
+          <a class="nav-link" href="faq.html">FAQ</a>
+          <a
+            class="button button-secondary"
+            href="https://github.com/BrandonAustin01/ClipVault"
+            >GitHub</a
+          >
+          <a
+            class="button button-primary"
+            href="https://github.com/BrandonAustin01/ClipVault/releases/latest"
+            >Download</a
+          >
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="container narrow">
+          <div class="eyebrow">Privacy</div>
+          <h1 class="page-title">Clear, local-first clipboard handling</h1>
+          <p class="page-text">
+            ClipVault is built around local text clipboard workflows. This page
+            explains what the app stores and what users should understand before
+            using backup and restore features.
+          </p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container narrow prose">
+          <div class="card note-card">
+            <strong>Important:</strong>
+            <p>
+              Clipboard content can be sensitive. Treat exported backups and
+              copied content with the same care you would give any other local
+              data on your machine.
+            </p>
+          </div>
+
+          <h2>What ClipVault stores</h2>
+          <p>ClipVault can store:</p>
+          <ul>
+            <li>Clipboard history entries</li>
+            <li>Pinned items</li>
+            <li>Snippets</li>
+            <li>Application settings</li>
+            <li>Log files used for troubleshooting</li>
+          </ul>
+
+          <h2>Where data is stored</h2>
+          <p>
+            ClipVault stores its local data inside the user’s local application
+            data area on Windows. That currently includes the app database,
+            settings, and log files.
+          </p>
+
+          <h2>What backups may include</h2>
+          <p>
+            Backup exports can include clipboard items and settings. If you
+            export a backup, treat that file carefully and only store or share
+            it in places you trust.
+          </p>
+
+          <h2>What ClipVault does not try to be</h2>
+          <p>
+            ClipVault is not a cloud sync service and is not presented as a
+            password manager. It is a local clipboard tool focused on helping
+            users organize and reuse text more effectively.
+          </p>
+
+          <h2>User control</h2>
+          <p>Users can already control core behavior such as:</p>
+          <ul>
+            <li>Whether clipboard monitoring is enabled</li>
+            <li>History size limits</li>
+            <li>Whether the app stays available in the tray</li>
+            <li>Whether to export or restore application data</li>
+          </ul>
+
+          <h2>Logs</h2>
+          <p>
+            ClipVault includes local log files to help with troubleshooting.
+            Users should avoid sharing logs publicly unless they have reviewed
+            them and are comfortable with the contents.
+          </p>
+
+          <h2>Ongoing improvements</h2>
+          <p>
+            ClipVault continues to improve how it handles sensitive clipboard
+            workflows. As privacy-focused controls expand, this page should be
+            kept in sync with those changes.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-row">
+        <p>© ClipVault</p>
+        <div class="footer-links">
+          <a href="docs.html">Docs</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="changelog.html">Changelog</a>
+          <a href="faq.html">FAQ</a>
+          <a href="https://github.com/BrandonAustin01/ClipVault">GitHub</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

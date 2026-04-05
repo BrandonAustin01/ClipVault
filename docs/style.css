@@ -46,6 +46,11 @@ a {
   text-decoration: none;
 }
 
+ol,
+ul {
+  padding-left: 1.2rem;
+}
+
 .container {
   width: min(var(--container), calc(100% - 32px));
   margin: 0 auto;
@@ -103,12 +108,28 @@ a {
   font-size: 0.95rem;
 }
 
-.nav-link:hover {
+.nav-link:hover,
+.active-link {
   color: var(--text);
 }
 
 .hero {
   padding: 72px 0 40px;
+}
+
+.page-hero {
+  padding: 72px 0 18px;
+}
+
+.page-title {
+  max-width: none;
+  font-size: clamp(2.3rem, 4.5vw, 4rem);
+}
+
+.page-text {
+  max-width: 60ch;
+  color: var(--muted);
+  font-size: 1.05rem;
 }
 
 .hero-grid {
@@ -153,7 +174,8 @@ h3 {
 .hero-text,
 .section-heading p,
 .card p,
-.site-footer p {
+.site-footer p,
+.page-text {
   color: var(--muted);
 }
 
@@ -294,6 +316,14 @@ h3 {
   padding: 14px;
 }
 
+.screenshot-card img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
 .screenshot-card p {
   margin: 14px 4px 4px;
   color: var(--text);
@@ -301,8 +331,72 @@ h3 {
 }
 
 .privacy-card,
-.cta-card {
+.cta-card,
+.doc-card,
+.faq-item,
+.version-card,
+.note-card {
   padding: 28px;
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 18px;
+}
+
+.doc-card ol,
+.doc-card ul,
+.doc-card p {
+  margin-bottom: 0;
+}
+
+.prose {
+  display: grid;
+  gap: 18px;
+}
+
+.prose h2 {
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+  margin-top: 14px;
+  margin-bottom: 6px;
+}
+
+.prose p,
+.prose li {
+  color: var(--muted);
+}
+
+.note-card {
+  margin-bottom: 10px;
+}
+
+.note-card strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.faq-list,
+.changelog-list {
+  display: grid;
+  gap: 18px;
+}
+
+.faq-item p,
+.version-card li {
+  margin-bottom: 0;
+}
+
+.version-label {
+  display: inline-flex;
+  padding: 8px 12px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: rgba(92, 160, 255, 0.12);
+  border: 1px solid rgba(92, 160, 255, 0.18);
 }
 
 .cta-card {
@@ -341,7 +435,8 @@ h3 {
   .hero-grid,
   .feature-grid,
   .screenshot-grid,
-  .trust-grid {
+  .trust-grid,
+  .doc-grid {
     grid-template-columns: 1fr;
   }
 
@@ -357,7 +452,8 @@ h3 {
 }
 
 @media (max-width: 640px) {
-  .hero {
+  .hero,
+  .page-hero {
     padding-top: 44px;
   }
 
