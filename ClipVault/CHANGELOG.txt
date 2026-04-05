@@ -1,20 +1,21 @@
 v1.2.0
 
 Highlights
-- Improved theme support across the main window
+- Expanded theme support across the full app
 - Styled settings checkboxes
+- Improved theme selection reliability
 - UI consistency and polish updates
-- Better release note and changelog flow
 
 Included in this release
-- Fixed live theme updates across more of the app UI
+- Fixed live theme updates across the main window and supporting windows
+- Updated dialogs, the snippet editor, the log viewer, and the update window to follow the active theme
 - Improved theme resource wiring and preview behavior
 - Styled settings checkboxes to better match the ClipVault look
 - Continued cleanup and polish across settings and shared UI
-- Prepared ClipVault to use an external changelog file instead of hardcoded release notes
+- Improved overall visual consistency throughout the app
 
 Summary
-ClipVault 1.2.0 continues the polish pass with better theming, cleaner settings visuals, and a more maintainable changelog workflow.
+ClipVault 1.2.0 continues the polish pass with stronger theming across the full app, cleaner settings visuals, and a more consistent UI experience throughout ClipVault.
 
 ────────────────────────
 
