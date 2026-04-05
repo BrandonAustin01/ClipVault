@@ -1,76 +1,90 @@
-# ClipVault
+<p align="center">
+  <img width="124" height="124" alt="ClipVaultLogo" src="https://github.com/user-attachments/assets/bd511f8c-3aa4-40a1-99c1-c88dcab40c74" />
+</p>
 
-ClipVault is a polished desktop clipboard manager for Windows built with WPF.
+<h1 align="center">ClipVault</h1>
 
-It keeps a history of copied text, lets you pin important items, create reusable snippets, review logs, and stay out of the way with tray support. The goal is simple: make copied text easier to keep, find, and reuse without turning the app into a mess.
+<p align="center">
+  A polished clipboard manager for Windows built with WPF.
+</p>
+
+ClipVault helps you keep, organize, and reuse copied text without the clutter. It stores clipboard history locally, lets you pin important entries, create reusable snippets, review logs, and stay out of the way with tray support.
 
 ## Features
 
-- **Clipboard history**
-  - Automatically captures copied text and stores it locally
-  - Prevents duplicate spam from immediately repeated copies
-  - Trims old history based on your configured history limit
+### Clipboard history
+- Automatically captures copied text
+- Stores clipboard history locally on your machine
+- Prevents duplicate spam from immediately repeated copies
+- Trims older entries based on your configured history limit
 
-- **Pinned items**
-  - Pin important clipboard entries so they stay easy to find
-  - Pinned items are protected from normal history cleanup
+### Pinned items
+- Pin important clipboard entries for quick access
+- Protect pinned items from normal history cleanup
 
-- **Snippets**
-  - Create reusable text snippets
-  - Edit existing snippets
-  - Copy snippets back to the clipboard instantly
+### Snippets
+- Create reusable text snippets
+- Edit existing snippets
+- Copy snippets back to the clipboard instantly
 
-- **Search and filtering**
-  - Search clipboard history, pinned items, and snippets
-  - Filter log entries by level in the log viewer
+### Search and filtering
+- Search clipboard history, pinned items, and snippets
+- Filter log entries by level in the log viewer
 
-- **Log viewer**
-  - View application logs from inside the app
-  - Filter by info, warning, and error entries
-  - Copy the visible log output or open the logs folder directly
+### Log viewer
+- View application logs from inside the app
+- Filter by info, warning, and error entries
+- Copy visible log output
+- Open the logs folder directly
 
-- **Tray support**
-  - Minimize to tray
-  - Close to tray
-  - Restore the app from the tray icon
+### Tray support
+- Minimize to tray
+- Close to tray
+- Restore the app from the tray icon
 
-- **Startup option**
-  - Optionally launch ClipVault at Windows startup
+### Startup option
+- Optionally launch ClipVault at Windows startup
 
-- **Local-first storage**
-  - Clipboard items and settings are stored locally on the machine
-  - Logs are stored locally as well
+### Local-first storage
+- Clipboard data is stored locally
+- Settings are stored locally
+- Logs are stored locally
 
-- **Built-in updating**
-  - Packaged releases support update checks through the ClipVault release feed
+### Built-in updating
+- Packaged releases support update checks through the ClipVault release feed
 
 ## Why ClipVault?
 
-A lot of clipboard tools either feel bloated, ugly, or unreliable. ClipVault is meant to feel clean and fast while still covering the stuff that actually matters:
+A lot of clipboard tools feel bloated, outdated, or unreliable.
 
-- recent clipboard history
-- pinned items
-- reusable snippets
-- searchable content
-- proper logging
-- a polished desktop UI
+ClipVault is designed to stay clean, fast, and focused on the features that matter most:
 
-## Screens
+- Clipboard history
+- Pinned items
+- Reusable snippets
+- Searchable content
+- Built-in logging
+- A polished desktop UI
 
-ClipVault V1 includes:
+It is built for people who want a better clipboard workflow without turning a simple utility into a mess.
 
-- Main window with History, Pinned, Snippets, and Settings sections
+## Included in v1
+
+ClipVault v1 includes:
+
+- Main window with **History**, **Pinned**, **Snippets**, and **Settings**
 - Snippet editor
-- Log viewer
+- Built-in log viewer
 - Dark-styled UI with polished controls
+- Packaged updater support
 
 ## Installation
 
 ### Standard install
-Download the latest `Setup.exe` from the ClipVault release location and run it like a normal Windows installer.
+Download the latest `Setup.exe` from the latest release and run it like a normal Windows installer.
 
-### Portable / manual files
-Some releases may also include packaged assets for update delivery and distribution.
+### Portable / release assets
+Some releases may also include packaged assets used for update delivery and distribution.
 
 ## Usage
 
@@ -78,10 +92,10 @@ Some releases may also include packaged assets for update delivery and distribut
 Once ClipVault is running, copied text is captured automatically when clipboard monitoring is enabled.
 
 ### Pinning
-Use the **Pin** action on any history item to keep it important and easy to access.
+Use the **Pin** action on any history item to keep it available and easy to find.
 
 ### Snippets
-Open the **Snippets** section to create and manage reusable text blocks.
+Open the **Snippets** section to create, edit, and reuse saved text blocks.
 
 ### Settings
 From **Settings**, you can manage:
@@ -93,23 +107,23 @@ From **Settings**, you can manage:
 - Maximum history size
 
 ### Log viewer
-Open the log viewer from the app to:
+Use the built-in log viewer to:
 
-- inspect logs
-- search logs
-- filter by level
-- copy the visible log output
-- open the logs folder
+- Inspect logs
+- Search log content
+- Filter by level
+- Copy visible log output
+- Open the logs folder
 
 ## Data Storage
 
 ClipVault stores its data locally in the user's local application data folder.
 
-That includes:
+This includes:
 
-- the SQLite database
-- settings
-- log files
+- SQLite database
+- Settings
+- Log files
 
 ## Update Flow
 
@@ -120,27 +134,27 @@ Typical release flow:
 1. Publish the app
 2. Pack the release
 3. Upload the generated release assets
-4. Install from the packaged setup
+4. Install using the packaged setup
 5. Use in-app update checking for future versions
 
 ## Project Status
 
-**Version 1.0.0** is the first polished release candidate-level version of ClipVault.
+**Version 1.x** represents the first polished foundation of ClipVault.
 
-V1 includes the completed core experience:
+Current releases include the core experience:
 
-- main window UI polish
-- snippet editor polish
-- log viewer
-- dark ComboBox fix in the log viewer
-- packaged updater flow
+- Main window UI polish
+- Snippet editor polish
+- Log viewer
+- Theme and shared UI improvements
+- Packaged updater flow
 
 ## Tech Stack
 
 - C#
 - WPF
 - SQLite
-- Velopack for packaged updates
+- Velopack
 
 ## Notes
 
