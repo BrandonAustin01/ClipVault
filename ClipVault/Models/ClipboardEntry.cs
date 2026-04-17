@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -6,11 +6,16 @@ namespace ClipVault.Models;
 
 public class ClipboardEntry : INotifyPropertyChanged
 {
+    private const string MaskedText = "••••••••••";
+
     private string _title = string.Empty;
     private string _category = "Text";
     private string _fullText = string.Empty;
     private bool _isSnippet;
     private bool _isPinned;
+    private bool _isSensitive;
+    private bool _isSensitiveManual;
+    private bool _isPreviewMasked;
     private DateTime _capturedAt = DateTime.Now;
 
     public int Id { get; set; }
@@ -24,6 +29,7 @@ public class ClipboardEntry : INotifyPropertyChanged
             {
                 _title = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(DisplayTitle));
             }
         }
     }
@@ -84,6 +90,52 @@ public class ClipboardEntry : INotifyPropertyChanged
         }
     }
 
+    public bool IsSensitive
+    {
+        get => _isSensitive;
+        set
+        {
+            if (_isSensitive != value)
+            {
+                _isSensitive = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(DisplayTitle));
+                OnPropertyChanged(nameof(DisplayText));
+                OnPropertyChanged(nameof(SensitiveButtonLabel));
+                OnPropertyChanged(nameof(SensitiveBadgeText));
+            }
+        }
+    }
+
+    public bool IsSensitiveManual
+    {
+        get => _isSensitiveManual;
+        set
+        {
+            if (_isSensitiveManual != value)
+            {
+                _isSensitiveManual = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(SensitiveBadgeText));
+            }
+        }
+    }
+
+    public bool IsPreviewMasked
+    {
+        get => _isPreviewMasked;
+        set
+        {
+            if (_isPreviewMasked != value)
+            {
+                _isPreviewMasked = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(DisplayTitle));
+                OnPropertyChanged(nameof(DisplayText));
+            }
+        }
+    }
+
     public DateTime CapturedAt
     {
         get => _capturedAt;
@@ -99,10 +151,27 @@ public class ClipboardEntry : INotifyPropertyChanged
         }
     }
 
+    public string DisplayTitle
+    {
+        get
+        {
+            if (IsSensitive && IsPreviewMasked)
+                return "Sensitive item";
+
+            if (string.IsNullOrWhiteSpace(Title))
+                return "Clipboard item";
+
+            return Title;
+        }
+    }
+
     public string DisplayText
     {
         get
         {
+            if (IsSensitive && IsPreviewMasked)
+                return MaskedText;
+
             if (string.IsNullOrWhiteSpace(FullText))
                 return "(empty)";
 
@@ -122,6 +191,10 @@ public class ClipboardEntry : INotifyPropertyChanged
         "History";
 
     public string PinButtonLabel => IsPinned ? "Unpin" : "Pin";
+
+    public string SensitiveButtonLabel => IsSensitive ? "Unmark Sensitive" : "Mark Sensitive";
+
+    public string SensitiveBadgeText => IsSensitiveManual ? "Sensitive • Manual" : "Sensitive";
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

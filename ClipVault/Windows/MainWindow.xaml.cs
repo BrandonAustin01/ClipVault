@@ -35,6 +35,7 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
     private readonly TrayIconService _trayIconService = new();
     private readonly UpdateService _updateService = new();
     private readonly BackupService _backupService = new();
+    private readonly SensitiveContentDetector _sensitiveContentDetector = new();
     private readonly string _displayVersion = AppVersionHelper.GetDisplayVersion();
 
 
@@ -298,6 +299,7 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
 
         foreach (var item in items)
         {
+            ApplySensitiveMaskingToEntry(item);
             AllItems.Add(item);
         }
     }
@@ -309,6 +311,9 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
         ChkMinimizeToTray.IsChecked = _appSettings.MinimizeToTray;
         ChkCloseToTray.IsChecked = _appSettings.CloseToTray;
         ChkCheckForUpdatesOnStartup.IsChecked = _appSettings.CheckForUpdatesOnStartup;
+        ChkDetectSensitiveClipboardContent.IsChecked = _appSettings.DetectSensitiveClipboardContent;
+        ChkMaskSensitiveClipboardContent.IsChecked = _appSettings.MaskSensitiveClipboardContent;
+        ChkExcludeSensitiveClipboardContent.IsChecked = _appSettings.ExcludeSensitiveClipboardContent;
         MaxHistoryItemsTextBox.Text = _appSettings.MaxHistoryItems.ToString();
 
         if (ThemeComboBox is not null)
@@ -407,6 +412,17 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
         if (!ShouldCaptureText(rawText))
             return;
 
+        SensitiveDetectionResult detection = _appSettings.DetectSensitiveClipboardContent
+            ? _sensitiveContentDetector.Evaluate(rawText)
+            : default;
+
+        if (detection.IsSensitive && _appSettings.ExcludeSensitiveClipboardContent)
+        {
+            StatusMessage = "Sensitive clipboard content detected and excluded from history.";
+            LogService.Info($"Sensitive clipboard content excluded from history. Reason: {detection.Reason}");
+            return;
+        }
+
         var entry = new ClipboardEntry
         {
             Title = BuildTitle(rawText),
@@ -414,8 +430,12 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
             FullText = rawText,
             IsSnippet = false,
             IsPinned = false,
+            IsSensitive = detection.IsSensitive,
+            IsSensitiveManual = false,
             CapturedAt = DateTime.Now
         };
+
+        ApplySensitiveMaskingToEntry(entry);
 
         entry.Id = _storageService.InsertItem(entry);
 
@@ -424,10 +444,10 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
         ApplyFilter();
 
         StatusMessage = trimmedCount > 0
-            ? $"Captured \"{entry.Title}\". Trimmed {trimmedCount} old item(s) to stay within the history limit."
-            : $"Captured \"{entry.Title}\".";
+            ? $"Captured {GetEntryLabelForStatus(entry)}. Trimmed {trimmedCount} old item(s) to stay within the history limit."
+            : $"Captured {GetEntryLabelForStatus(entry)}.";
 
-        LogService.Info($"Clipboard text captured: {entry.Title}");
+        LogService.Info($"Clipboard text captured: {GetEntryLabelForLog(entry)}");
     }
 
     private bool ShouldCaptureText(string? rawText)
@@ -542,6 +562,32 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
             return "Note";
 
         return "Text";
+    }
+
+    private void ApplySensitiveMaskingToEntry(ClipboardEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        entry.IsPreviewMasked = entry.IsSensitive && _appSettings.MaskSensitiveClipboardContent;
+    }
+
+    private void ApplySensitivePreviewMasking()
+    {
+        foreach (var item in AllItems)
+        {
+            ApplySensitiveMaskingToEntry(item);
+        }
+    }
+
+    private static string GetEntryLabelForLog(ClipboardEntry item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        return item.IsSensitive ? "[sensitive item]" : item.Title;
+    }
+
+    private static string GetEntryLabelForStatus(ClipboardEntry item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        return item.IsSensitive ? "sensitive item" : $"\"{item.Title}\"";
     }
 
     private void SetSection(string section)
@@ -854,8 +900,8 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
                 return;
             }
 
-            StatusMessage = $"Copied \"{item.Title}\" back to the clipboard.";
-            LogService.Info($"Clipboard item copied: {item.Title}");
+            StatusMessage = $"Copied {GetEntryLabelForStatus(item)} back to the clipboard.";
+            LogService.Info($"Clipboard item copied: {GetEntryLabelForLog(item)}");
         }, "Clipboard copy");
     }
 
@@ -877,11 +923,46 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
             ApplyFilter();
 
             StatusMessage = item.IsPinned
-                ? $"Pinned \"{item.Title}\"."
-                : $"Unpinned \"{item.Title}\".";
+                ? $"Pinned {GetEntryLabelForStatus(item)}."
+                : $"Unpinned {GetEntryLabelForStatus(item)}.";
 
-            LogService.Info($"Pin state changed for {item.Title}. IsPinned={item.IsPinned}");
+            LogService.Info($"Pin state changed for {GetEntryLabelForLog(item)}. IsPinned={item.IsPinned}");
         }, "Pin toggle");
+    }
+
+    private void ToggleSensitiveButton_Click(object sender, RoutedEventArgs e)
+    {
+        RunGuarded(() =>
+        {
+            var item = FindEntryFromButton(sender);
+            if (item is null)
+            {
+                StatusMessage = "Could not find that clipboard item.";
+                LogService.Warn("Sensitive toggle requested for an item that could not be found.");
+                return;
+            }
+
+            bool wasSensitive = item.IsSensitive;
+            bool markSensitive = !item.IsSensitive;
+
+            item.IsSensitive = markSensitive;
+            item.IsSensitiveManual = markSensitive;
+            ApplySensitiveMaskingToEntry(item);
+
+            _storageService.UpdateSensitivityState(item.Id, item.IsSensitive, item.IsSensitiveManual);
+
+            ApplyFilter();
+
+            StatusMessage = markSensitive
+                ? "Marked the item as sensitive."
+                : "Removed the sensitive flag from the item.";
+
+            LogService.Info(markSensitive
+                ? "Item marked as sensitive."
+                : wasSensitive
+                    ? "Sensitive flag removed from item."
+                    : "Sensitive flag toggle completed.");
+        }, "Sensitive toggle");
     }
 
     private void DeleteItemButton_Click(object sender, RoutedEventArgs e)
@@ -898,8 +979,12 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
 
             string itemType = item.IsSnippet ? "snippet" : "clipboard item";
 
+            string deletePrompt = item.IsSensitive
+                ? $"Delete this {itemType}?{Environment.NewLine}{Environment.NewLine}This item is marked sensitive."
+                : $"Delete this {itemType}?{Environment.NewLine}{Environment.NewLine}\"{item.Title}\"";
+
             var result = DialogService.Show(
-                $"Delete this {itemType}?{Environment.NewLine}{Environment.NewLine}\"{item.Title}\"",
+                deletePrompt,
                 "ClipVault",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
@@ -916,10 +1001,10 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
             ApplyFilter();
 
             StatusMessage = item.IsSnippet
-                ? $"Deleted snippet \"{item.Title}\"."
-                : $"Deleted \"{item.Title}\".";
+                ? $"Deleted snippet {GetEntryLabelForStatus(item)}."
+                : $"Deleted {GetEntryLabelForStatus(item)}.";
 
-            LogService.Info($"{itemType} deleted: {item.Title}");
+            LogService.Info($"{itemType} deleted: {GetEntryLabelForLog(item)}");
         }, "Item deletion");
     }
 
@@ -939,6 +1024,9 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
             _appSettings.MinimizeToTray = ChkMinimizeToTray.IsChecked == true;
             _appSettings.CloseToTray = ChkCloseToTray.IsChecked == true;
             _appSettings.CheckForUpdatesOnStartup = ChkCheckForUpdatesOnStartup.IsChecked == true;
+            _appSettings.DetectSensitiveClipboardContent = ChkDetectSensitiveClipboardContent.IsChecked == true;
+            _appSettings.MaskSensitiveClipboardContent = ChkMaskSensitiveClipboardContent.IsChecked == true;
+            _appSettings.ExcludeSensitiveClipboardContent = ChkExcludeSensitiveClipboardContent.IsChecked == true;
             _appSettings.MaxHistoryItems = maxHistoryItems;
             string selectedTheme =
                 (ThemeComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString()
@@ -954,6 +1042,7 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
 
             ApplyClipboardMonitoringSetting();
             ApplyTrayVisibility();
+            ApplySensitivePreviewMasking();
 
             int trimmedCount = TrimHistory();
             ApplyFilter();

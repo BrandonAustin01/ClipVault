@@ -51,6 +51,9 @@
         <SolidColorBrush po:Freeze="False" x:Key="PillBorderBrush" Color="#29435D"/>
         <SolidColorBrush po:Freeze="False" x:Key="PinnedCardBrush" Color="#142334"/>
         <SolidColorBrush po:Freeze="False" x:Key="PinnedBorderBrush" Color="#4A86C7"/>
+        <SolidColorBrush po:Freeze="False" x:Key="SensitiveBadgeBackgroundBrush" Color="#2A2230"/>
+        <SolidColorBrush po:Freeze="False" x:Key="SensitiveBadgeBorderBrush" Color="#8E79C7"/>
+        <SolidColorBrush po:Freeze="False" x:Key="SensitiveBadgeTextBrush" Color="#D7C9FF"/>
         <SolidColorBrush po:Freeze="False" x:Key="SidebarHoverBrush" Color="#142131"/>
         <SolidColorBrush po:Freeze="False" x:Key="SidebarHoverBorderBrush" Color="#24384C"/>
         <SolidColorBrush po:Freeze="False" x:Key="SidebarPressedBrush" Color="#1A2D42"/>
@@ -850,7 +853,7 @@
                                                         </Grid.ColumnDefinitions>
 
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="{Binding Title}"
+                                                            <TextBlock Text="{Binding DisplayTitle}"
                                                                        FontSize="16"
                                                                        FontWeight="SemiBold"
                                                                        Foreground="{DynamicResource TextPrimaryBrush}"
@@ -865,6 +868,30 @@
                                                                     VerticalAlignment="Center">
                                                                 <TextBlock Text="{Binding PinStateLabel}"
                                                                            Foreground="{DynamicResource AccentStrongBrush}"
+                                                                           FontSize="11"
+                                                                           FontWeight="SemiBold"/>
+                                                            </Border>
+
+                                                            <Border Background="{DynamicResource SensitiveBadgeBackgroundBrush}"
+                                                                    BorderBrush="{DynamicResource SensitiveBadgeBorderBrush}"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="11"
+                                                                    Padding="10,4"
+                                                                    Margin="8,0,0,0"
+                                                                    VerticalAlignment="Center">
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsSensitive}" Value="True">
+                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Border.Style>
+
+                                                                <TextBlock Text="{Binding SensitiveBadgeText}"
+                                                                           Foreground="{DynamicResource SensitiveBadgeTextBrush}"
                                                                            FontSize="11"
                                                                            FontWeight="SemiBold"/>
                                                             </Border>
@@ -915,6 +942,12 @@
                                                                     Tag="{Binding Id}"
                                                                     Style="{StaticResource ActionButtonStyle}"
                                                                     Click="TogglePinButton_Click"/>
+
+                                                            <Button Content="{Binding SensitiveButtonLabel}"
+                                                                    MinWidth="132"
+                                                                    Tag="{Binding Id}"
+                                                                    Style="{StaticResource ActionButtonStyle}"
+                                                                    Click="ToggleSensitiveButton_Click"/>
 
                                                             <Button Content="Edit"
                                                                     Width="88"
@@ -1036,6 +1069,38 @@
                                                     Style="{StaticResource PrimaryButtonStyle}"
                                                     Click="SaveSettingsButton_Click"/>
                                         </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Privacy -->
+                                <Border Margin="0,14,0,0"
+                                        Style="{StaticResource SettingsCardStyle}"
+                                        Padding="22">
+                                    <StackPanel>
+                                        <TextBlock Text="Privacy"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+
+                                        <TextBlock Text="Control how ClipVault handles copied passwords, tokens, and other likely secrets."
+                                                   Margin="0,6,0,0"
+                                                   Foreground="{DynamicResource TextMutedBrush}"
+                                                   TextWrapping="Wrap"/>
+
+                                        <CheckBox x:Name="ChkDetectSensitiveClipboardContent"
+                                                  Content="Detect likely sensitive clipboard content automatically"
+                                                  Margin="0,22,0,0"
+                                                  Style="{StaticResource SettingCheckBoxStyle}"/>
+
+                                        <CheckBox x:Name="ChkMaskSensitiveClipboardContent"
+                                                  Content="Mask sensitive item titles and previews in the UI"
+                                                  Margin="0,10,0,0"
+                                                  Style="{StaticResource SettingCheckBoxStyle}"/>
+
+                                        <CheckBox x:Name="ChkExcludeSensitiveClipboardContent"
+                                                  Content="Do not save auto-detected sensitive items to history"
+                                                  Margin="0,10,0,0"
+                                                  Style="{StaticResource SettingCheckBoxStyle}"/>
                                     </StackPanel>
                                 </Border>
 

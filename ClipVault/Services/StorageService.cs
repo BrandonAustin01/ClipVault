@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using ClipVault.Models;
 using Microsoft.Data.Sqlite;
 
@@ -50,12 +51,18 @@ public sealed class StorageService
 
         command.ExecuteNonQuery();
 
+        EnsureClipboardItemsColumn(connection, "IsSensitive", "INTEGER NOT NULL DEFAULT 0");
+        EnsureClipboardItemsColumn(connection, "IsSensitiveManual", "INTEGER NOT NULL DEFAULT 0");
+
         EnsureDefaultSetting("MaxHistoryItems", DefaultMaxHistoryItems.ToString(CultureInfo.InvariantCulture));
         EnsureDefaultSetting("ClipboardMonitoringEnabled", "1");
         EnsureDefaultSetting("LaunchOnStartup", "0");
         EnsureDefaultSetting("MinimizeToTray", "0");
         EnsureDefaultSetting("CloseToTray", "0");
         EnsureDefaultSetting("CheckForUpdatesOnStartup", "1");
+        EnsureDefaultSetting("DetectSensitiveClipboardContent", "1");
+        EnsureDefaultSetting("MaskSensitiveClipboardContent", "1");
+        EnsureDefaultSetting("ExcludeSensitiveClipboardContent", "0");
         EnsureDefaultSetting("Theme", "Midnight");
         EnsureDefaultSetting("UpdateFeedUrl", string.Empty);
     }
@@ -70,7 +77,7 @@ public sealed class StorageService
         using var command = connection.CreateCommand();
         command.CommandText =
             """
-            SELECT Id, Title, Category, FullText, IsSnippet, IsPinned, CapturedAt
+            SELECT Id, Title, Category, FullText, IsSnippet, IsPinned, CapturedAt, IsSensitive, IsSensitiveManual
             FROM ClipboardItems
             ORDER BY datetime(CapturedAt) DESC, Id DESC;
             """;
@@ -91,7 +98,9 @@ public sealed class StorageService
                 CapturedAt = DateTime.Parse(
                     capturedAtRaw,
                     CultureInfo.InvariantCulture,
-                    DateTimeStyles.RoundtripKind)
+                    DateTimeStyles.RoundtripKind),
+                IsSensitive = reader.GetInt32(7) == 1,
+                IsSensitiveManual = reader.GetInt32(8) == 1
             });
         }
 
@@ -129,16 +138,18 @@ public sealed class StorageService
             insertItemCommand.Transaction = transaction;
             insertItemCommand.CommandText =
                 """
-            INSERT INTO ClipboardItems (Title, Category, FullText, IsSnippet, IsPinned, CapturedAt)
-            VALUES ($title, $category, $fullText, $isSnippet, $isPinned, $capturedAt);
-            """;
+                INSERT INTO ClipboardItems (Title, Category, FullText, IsSnippet, IsPinned, CapturedAt, IsSensitive, IsSensitiveManual)
+                VALUES ($title, $category, $fullText, $isSnippet, $isPinned, $capturedAt, $isSensitive, $isSensitiveManual);
+                """;
 
-            var titleParameter = insertItemCommand.Parameters.Add("$title", Microsoft.Data.Sqlite.SqliteType.Text);
-            var categoryParameter = insertItemCommand.Parameters.Add("$category", Microsoft.Data.Sqlite.SqliteType.Text);
-            var fullTextParameter = insertItemCommand.Parameters.Add("$fullText", Microsoft.Data.Sqlite.SqliteType.Text);
-            var isSnippetParameter = insertItemCommand.Parameters.Add("$isSnippet", Microsoft.Data.Sqlite.SqliteType.Integer);
-            var isPinnedParameter = insertItemCommand.Parameters.Add("$isPinned", Microsoft.Data.Sqlite.SqliteType.Integer);
-            var capturedAtParameter = insertItemCommand.Parameters.Add("$capturedAt", Microsoft.Data.Sqlite.SqliteType.Text);
+            var titleParameter = insertItemCommand.Parameters.Add("$title", SqliteType.Text);
+            var categoryParameter = insertItemCommand.Parameters.Add("$category", SqliteType.Text);
+            var fullTextParameter = insertItemCommand.Parameters.Add("$fullText", SqliteType.Text);
+            var isSnippetParameter = insertItemCommand.Parameters.Add("$isSnippet", SqliteType.Integer);
+            var isPinnedParameter = insertItemCommand.Parameters.Add("$isPinned", SqliteType.Integer);
+            var capturedAtParameter = insertItemCommand.Parameters.Add("$capturedAt", SqliteType.Text);
+            var isSensitiveParameter = insertItemCommand.Parameters.Add("$isSensitive", SqliteType.Integer);
+            var isSensitiveManualParameter = insertItemCommand.Parameters.Add("$isSensitiveManual", SqliteType.Integer);
 
             foreach (var item in itemList)
             {
@@ -148,6 +159,8 @@ public sealed class StorageService
                 isSnippetParameter.Value = item.IsSnippet ? 1 : 0;
                 isPinnedParameter.Value = item.IsPinned ? 1 : 0;
                 capturedAtParameter.Value = item.CapturedAt.ToString("O", CultureInfo.InvariantCulture);
+                isSensitiveParameter.Value = item.IsSensitive ? 1 : 0;
+                isSensitiveManualParameter.Value = item.IsSensitiveManual ? 1 : 0;
 
                 insertItemCommand.ExecuteNonQuery();
             }
@@ -159,22 +172,25 @@ public sealed class StorageService
         SaveSettingInternal(connection, transaction, "MinimizeToTray", settings.MinimizeToTray ? "1" : "0");
         SaveSettingInternal(connection, transaction, "CloseToTray", settings.CloseToTray ? "1" : "0");
         SaveSettingInternal(connection, transaction, "CheckForUpdatesOnStartup", settings.CheckForUpdatesOnStartup ? "1" : "0");
+        SaveSettingInternal(connection, transaction, "DetectSensitiveClipboardContent", settings.DetectSensitiveClipboardContent ? "1" : "0");
+        SaveSettingInternal(connection, transaction, "MaskSensitiveClipboardContent", settings.MaskSensitiveClipboardContent ? "1" : "0");
+        SaveSettingInternal(connection, transaction, "ExcludeSensitiveClipboardContent", settings.ExcludeSensitiveClipboardContent ? "1" : "0");
         SaveSettingInternal(connection, transaction, "Theme", NormalizeThemeValue(settings.Theme));
         SaveSettingInternal(connection, transaction, "UpdateFeedUrl", settings.UpdateFeedUrl ?? string.Empty);
 
         transaction.Commit();
     }
 
-    private static void SaveSettingInternal(SqliteConnection connection,SqliteTransaction transaction, string key, string value)
+    private static void SaveSettingInternal(SqliteConnection connection, SqliteTransaction transaction, string key, string value)
     {
         using var command = connection.CreateCommand();
         command.Transaction = transaction;
         command.CommandText =
             """
-        INSERT INTO AppSettings (Key, Value)
-        VALUES ($key, $value)
-        ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;
-        """;
+            INSERT INTO AppSettings (Key, Value)
+            VALUES ($key, $value)
+            ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;
+            """;
 
         command.Parameters.AddWithValue("$key", key);
         command.Parameters.AddWithValue("$value", value);
@@ -190,8 +206,8 @@ public sealed class StorageService
         using var command = connection.CreateCommand();
         command.CommandText =
             """
-            INSERT INTO ClipboardItems (Title, Category, FullText, IsSnippet, IsPinned, CapturedAt)
-            VALUES ($title, $category, $fullText, $isSnippet, $isPinned, $capturedAt);
+            INSERT INTO ClipboardItems (Title, Category, FullText, IsSnippet, IsPinned, CapturedAt, IsSensitive, IsSensitiveManual)
+            VALUES ($title, $category, $fullText, $isSnippet, $isPinned, $capturedAt, $isSensitive, $isSensitiveManual);
 
             SELECT last_insert_rowid();
             """;
@@ -202,6 +218,8 @@ public sealed class StorageService
         command.Parameters.AddWithValue("$isSnippet", item.IsSnippet ? 1 : 0);
         command.Parameters.AddWithValue("$isPinned", item.IsPinned ? 1 : 0);
         command.Parameters.AddWithValue("$capturedAt", item.CapturedAt.ToString("O", CultureInfo.InvariantCulture));
+        command.Parameters.AddWithValue("$isSensitive", item.IsSensitive ? 1 : 0);
+        command.Parameters.AddWithValue("$isSensitiveManual", item.IsSensitiveManual ? 1 : 0);
 
         object? result = command.ExecuteScalar();
         return Convert.ToInt32(result, CultureInfo.InvariantCulture);
@@ -222,6 +240,27 @@ public sealed class StorageService
 
         command.Parameters.AddWithValue("$id", id);
         command.Parameters.AddWithValue("$isPinned", isPinned ? 1 : 0);
+
+        command.ExecuteNonQuery();
+    }
+
+    public void UpdateSensitivityState(int id, bool isSensitive, bool isSensitiveManual)
+    {
+        using var connection = CreateConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            UPDATE ClipboardItems
+            SET IsSensitive = $isSensitive,
+                IsSensitiveManual = $isSensitiveManual
+            WHERE Id = $id;
+            """;
+
+        command.Parameters.AddWithValue("$id", id);
+        command.Parameters.AddWithValue("$isSensitive", isSensitive ? 1 : 0);
+        command.Parameters.AddWithValue("$isSensitiveManual", isSensitiveManual ? 1 : 0);
 
         command.ExecuteNonQuery();
     }
@@ -306,6 +345,9 @@ public sealed class StorageService
             MinimizeToTray = GetBoolSetting("MinimizeToTray", false),
             CloseToTray = GetBoolSetting("CloseToTray", false),
             CheckForUpdatesOnStartup = GetBoolSetting("CheckForUpdatesOnStartup", true),
+            DetectSensitiveClipboardContent = GetBoolSetting("DetectSensitiveClipboardContent", true),
+            MaskSensitiveClipboardContent = GetBoolSetting("MaskSensitiveClipboardContent", true),
+            ExcludeSensitiveClipboardContent = GetBoolSetting("ExcludeSensitiveClipboardContent", false),
             Theme = NormalizeThemeValue(GetSetting("Theme")),
             UpdateFeedUrl = GetSetting("UpdateFeedUrl") ?? string.Empty
         };
@@ -321,6 +363,9 @@ public sealed class StorageService
         SaveSetting("MinimizeToTray", settings.MinimizeToTray ? "1" : "0");
         SaveSetting("CloseToTray", settings.CloseToTray ? "1" : "0");
         SaveSetting("CheckForUpdatesOnStartup", settings.CheckForUpdatesOnStartup ? "1" : "0");
+        SaveSetting("DetectSensitiveClipboardContent", settings.DetectSensitiveClipboardContent ? "1" : "0");
+        SaveSetting("MaskSensitiveClipboardContent", settings.MaskSensitiveClipboardContent ? "1" : "0");
+        SaveSetting("ExcludeSensitiveClipboardContent", settings.ExcludeSensitiveClipboardContent ? "1" : "0");
         SaveSetting("Theme", NormalizeThemeValue(settings.Theme));
         SaveSetting("UpdateFeedUrl", settings.UpdateFeedUrl ?? string.Empty);
     }
@@ -407,6 +452,36 @@ public sealed class StorageService
         {
             SaveSetting(key, defaultValue);
         }
+    }
+
+    private static void EnsureClipboardItemsColumn(SqliteConnection connection, string columnName, string columnDefinition)
+    {
+        bool columnExists;
+
+        using (var pragmaCommand = connection.CreateCommand())
+        {
+            pragmaCommand.CommandText = "PRAGMA table_info(ClipboardItems);";
+
+            using var reader = pragmaCommand.ExecuteReader();
+            columnExists = false;
+
+            while (reader.Read())
+            {
+                string existingColumn = reader.GetString(1);
+                if (string.Equals(existingColumn, columnName, StringComparison.OrdinalIgnoreCase))
+                {
+                    columnExists = true;
+                    break;
+                }
+            }
+        }
+
+        if (columnExists)
+            return;
+
+        using var alterCommand = connection.CreateCommand();
+        alterCommand.CommandText = $"ALTER TABLE ClipboardItems ADD COLUMN {columnName} {columnDefinition};";
+        alterCommand.ExecuteNonQuery();
     }
 
     private SqliteConnection CreateConnection()

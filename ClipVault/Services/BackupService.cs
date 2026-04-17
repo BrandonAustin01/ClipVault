@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace ClipVault.Services;
 public sealed class BackupDocument
 {
     public string AppName { get; set; } = "ClipVault";
-    public int SchemaVersion { get; set; } = 1;
+    public int SchemaVersion { get; set; } = 2;
     public string ExportedFromVersion { get; set; } = string.Empty;
     public DateTime ExportedAtUtc { get; set; } = DateTime.UtcNow;
     public BackupAppSettings Settings { get; set; } = new();
@@ -27,6 +27,9 @@ public sealed class BackupAppSettings
     public string Theme { get; set; } = "Dark";
     public string UpdateFeedUrl { get; set; } = string.Empty;
     public bool CheckForUpdatesOnStartup { get; set; } = true;
+    public bool DetectSensitiveClipboardContent { get; set; } = true;
+    public bool MaskSensitiveClipboardContent { get; set; } = true;
+    public bool ExcludeSensitiveClipboardContent { get; set; }
 }
 
 public sealed class BackupClipboardEntry
@@ -36,6 +39,8 @@ public sealed class BackupClipboardEntry
     public string FullText { get; set; } = string.Empty;
     public bool IsSnippet { get; set; }
     public bool IsPinned { get; set; }
+    public bool IsSensitive { get; set; }
+    public bool IsSensitiveManual { get; set; }
     public DateTime CapturedAt { get; set; } = DateTime.Now;
 }
 
@@ -71,7 +76,7 @@ public sealed class BackupService
         var document = new BackupDocument
         {
             AppName = "ClipVault",
-            SchemaVersion = 1,
+            SchemaVersion = 2,
             ExportedFromVersion = appVersion?.Trim() ?? string.Empty,
             ExportedAtUtc = DateTime.UtcNow,
             Settings = new BackupAppSettings
@@ -83,7 +88,10 @@ public sealed class BackupService
                 MinimizeToTray = settings.MinimizeToTray,
                 CloseToTray = settings.CloseToTray,
                 Theme = settings.Theme ?? "Dark",
-                UpdateFeedUrl = settings.UpdateFeedUrl ?? string.Empty
+                UpdateFeedUrl = settings.UpdateFeedUrl ?? string.Empty,
+                DetectSensitiveClipboardContent = settings.DetectSensitiveClipboardContent,
+                MaskSensitiveClipboardContent = settings.MaskSensitiveClipboardContent,
+                ExcludeSensitiveClipboardContent = settings.ExcludeSensitiveClipboardContent
             },
             Items = items.Select(item => new BackupClipboardEntry
             {
@@ -92,6 +100,8 @@ public sealed class BackupService
                 FullText = item.FullText,
                 IsSnippet = item.IsSnippet,
                 IsPinned = item.IsPinned,
+                IsSensitive = item.IsSensitive,
+                IsSensitiveManual = item.IsSensitiveManual,
                 CapturedAt = item.CapturedAt
             }).ToList()
         };
@@ -129,7 +139,10 @@ public sealed class BackupService
             MinimizeToTray = document.Settings.MinimizeToTray,
             CloseToTray = document.Settings.CloseToTray,
             Theme = string.IsNullOrWhiteSpace(document.Settings.Theme) ? "Dark" : document.Settings.Theme,
-            UpdateFeedUrl = document.Settings.UpdateFeedUrl ?? string.Empty
+            UpdateFeedUrl = document.Settings.UpdateFeedUrl ?? string.Empty,
+            DetectSensitiveClipboardContent = document.Settings.DetectSensitiveClipboardContent,
+            MaskSensitiveClipboardContent = document.Settings.MaskSensitiveClipboardContent,
+            ExcludeSensitiveClipboardContent = document.Settings.ExcludeSensitiveClipboardContent
         };
     }
 
@@ -144,6 +157,8 @@ public sealed class BackupService
             FullText = item.FullText ?? string.Empty,
             IsSnippet = item.IsSnippet,
             IsPinned = item.IsPinned,
+            IsSensitive = item.IsSensitive,
+            IsSensitiveManual = item.IsSensitiveManual,
             CapturedAt = item.CapturedAt
         }).ToList();
     }
@@ -153,7 +168,7 @@ public sealed class BackupService
         if (!string.Equals(document.AppName, "ClipVault", StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("This file is not a ClipVault backup.");
 
-        if (document.SchemaVersion != 1)
+        if (document.SchemaVersion is not 1 and not 2)
             throw new InvalidOperationException($"Unsupported backup schema version: {document.SchemaVersion}.");
 
         document.Settings ??= new BackupAppSettings();
