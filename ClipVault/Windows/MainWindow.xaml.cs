@@ -314,6 +314,7 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
         ChkDetectSensitiveClipboardContent.IsChecked = _appSettings.DetectSensitiveClipboardContent;
         ChkMaskSensitiveClipboardContent.IsChecked = _appSettings.MaskSensitiveClipboardContent;
         ChkExcludeSensitiveClipboardContent.IsChecked = _appSettings.ExcludeSensitiveClipboardContent;
+        UpdateSensitiveSettingsAvailability();
         MaxHistoryItemsTextBox.Text = _appSettings.MaxHistoryItems.ToString();
 
         if (ThemeComboBox is not null)
@@ -575,6 +576,21 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
         foreach (var item in AllItems)
         {
             ApplySensitiveMaskingToEntry(item);
+        }
+    }
+
+    private void UpdateSensitiveSettingsAvailability()
+    {
+        bool detectionEnabled = ChkDetectSensitiveClipboardContent?.IsChecked == true;
+
+        if (ChkMaskSensitiveClipboardContent is not null)
+        {
+            ChkMaskSensitiveClipboardContent.IsEnabled = detectionEnabled;
+        }
+
+        if (ChkExcludeSensitiveClipboardContent is not null)
+        {
+            ChkExcludeSensitiveClipboardContent.IsEnabled = detectionEnabled;
         }
     }
 
@@ -1006,6 +1022,11 @@ public partial class MainWindow : WpfWindow, INotifyPropertyChanged
 
             LogService.Info($"{itemType} deleted: {GetEntryLabelForLog(item)}");
         }, "Item deletion");
+    }
+
+    private void SensitiveDetectionSettingChanged(object sender, RoutedEventArgs e)
+    {
+        UpdateSensitiveSettingsAvailability();
     }
 
     private void SaveSettingsButton_Click(object sender, RoutedEventArgs e)

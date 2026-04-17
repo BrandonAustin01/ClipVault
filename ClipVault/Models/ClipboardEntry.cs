@@ -103,6 +103,7 @@ public class ClipboardEntry : INotifyPropertyChanged
                 OnPropertyChanged(nameof(DisplayText));
                 OnPropertyChanged(nameof(SensitiveButtonLabel));
                 OnPropertyChanged(nameof(SensitiveBadgeText));
+                OnPropertyChanged(nameof(SensitiveStateDescription));
             }
         }
     }
@@ -117,6 +118,7 @@ public class ClipboardEntry : INotifyPropertyChanged
                 _isSensitiveManual = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SensitiveBadgeText));
+                OnPropertyChanged(nameof(SensitiveStateDescription));
             }
         }
     }
@@ -132,6 +134,7 @@ public class ClipboardEntry : INotifyPropertyChanged
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(DisplayTitle));
                 OnPropertyChanged(nameof(DisplayText));
+                OnPropertyChanged(nameof(SensitiveStateDescription));
             }
         }
     }
@@ -195,6 +198,22 @@ public class ClipboardEntry : INotifyPropertyChanged
     public string SensitiveButtonLabel => IsSensitive ? "Unmark Sensitive" : "Mark Sensitive";
 
     public string SensitiveBadgeText => IsSensitiveManual ? "Sensitive • Manual" : "Sensitive";
+
+    public string SensitiveStateDescription
+    {
+        get
+        {
+            if (!IsSensitive)
+                return string.Empty;
+
+            if (IsPreviewMasked)
+                return "Preview hidden in ClipVault. Copy to use the original text.";
+
+            return IsSensitiveManual
+                ? "Manually marked sensitive. Visible because masking is off."
+                : "Auto-detected as sensitive. Visible because masking is off.";
+        }
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
